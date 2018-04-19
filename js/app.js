@@ -90,7 +90,9 @@ Player.prototype.handleInput = function(press) {
 
 var player = new Player();
 
+function Colectibles() {
 
+}
 
 
 // Now instantiate your objects.
