@@ -13,11 +13,13 @@
  * writing app.js a little simpler to work with.
  */
 
+let testing;
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
+
     var doc = global.document,
         win = global.window,
         canvas = doc.createElement('canvas'),
@@ -44,6 +46,7 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
+
         update(dt);
         render();
 
@@ -55,7 +58,8 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        let anim = win.requestAnimationFrame(main);
+        pauseSc(anim);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -64,8 +68,7 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
-        lastTime = Date.now();
-        main();
+
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -94,6 +97,7 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+        pause.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -106,6 +110,7 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
+
         var rowImages = [
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
@@ -137,7 +142,6 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-
         renderEntities();
     }
 
@@ -154,6 +158,7 @@ var Engine = (function(global) {
         });
         star.render();
         player.render();
+        pause.render();
 
     }
 
@@ -162,8 +167,36 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
+            render();
+            const body = document.querySelector('body');
+    const modal = document.createElement('modal');
+    modal.classList.add('menu');
+    body.appendChild(modal);
+
+    console.log('works');
+    const button = document.createElement('button');
+    button.innerHTML = "start";
+    button.classList.add('start');
+    modal.appendChild(button);
+
+    button.addEventListener('click', function(event) {
+    testing = event;
+
+    modal.style.display = "none";
+    lastTime = Date.now();
+        main();
+
+    });
         // noop
     }
+
+    function pauseSc(el) {
+            if (k) {
+            win.cancelAnimationFrame(el);
+        }
+    }
+
+
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when

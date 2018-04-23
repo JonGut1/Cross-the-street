@@ -1,6 +1,6 @@
 // Enemies our player must avoid
 let allEnemies = [];
-
+let test = false;
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -33,19 +33,40 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.coordinatesX += this.speed * dt;
+    this.coordinatesX += (this.speed * dt);
 
     if (this.coordinatesX > 606) {
         this.coordinatesX = -101;
         this.moveY = Math.floor(Math.random() * 3);
         this.coordinatesY = this.gridY[this.moveY];
-        if (this.speed >= 350)
-        this.speed = Math.floor(Math.random() * (400 - 300) + 300);
-        else if (this.speed < 300 && this.speed >= 250) {
+        if (this.speed > 500) {
+            this.speed = Math.floor(Math.random() * (600 - 501) + 501);
+        } else if (this.speed > 400) {
+            this.speed = Math.floor(Math.random() * (500 - 401) + 401);
+        } else if (this.speed >= 350) {
+            this.speed = Math.floor(Math.random() * (400 - 300) + 300);
+        } else if (this.speed < 300 && this.speed >= 250) {
             this.speed = Math.floor(Math.random() * (299 - 200) + 200);
         } else {
             this.speed = Math.floor(Math.random() * (400 - 150) + 150);
         }
+        if (player.levels <= 1) {
+            if (player.dificulty === 1) {
+            allEnemies.push(new Enemy);
+            player.dificulty = 0;
+            }
+        }
+        if (player.levels === 2) {
+            this.speed = Math.floor(Math.random() * (500 - 300) + 300);
+        } else if (player.levels === 3) {
+            this.speed = Math.floor(Math.random() * (600 - 400) + 400);
+        } else if (player.levels === 5) {
+            if (player.dificulty === 1) {
+                allEnemies.push(new Enmey);
+                player.dificulty = 0;
+            }
+        }
+
     }
 };
 
@@ -64,7 +85,7 @@ function checkCollisions() {
 }
 
 
-for (let i = 0; i <= 3; i++) {
+for (let i = 0; i <= 2; i++) {
     allEnemies.push(new Enemy);
 }
 
@@ -95,6 +116,8 @@ function Player() {
     this.moveX = 2;
     this.coordinatesX = this.gridX[this.moveX];
     this.coordinatesY = this.gridY[this.moveY];
+    this.dificulty = 0;
+    this.levels = 0;
 };
 
 
@@ -113,8 +136,11 @@ Player.prototype.update = function() {
 Player.prototype.handleInput = function(press) {
     if (press === "up") {
         if (this.moveY === 0) {
+            this.dificulty += 1
+            this.levels += 1;
             this.moveY = 5;
             this.moveX = 2;
+            test = true;
         }
         console.log('up');
         this.moveY -= 1;
@@ -204,11 +230,11 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
-let test;
+
 (function mobileButtons() {
     const buttons = document.querySelector('.buttonCont');
     buttons.addEventListener('click', function(event) {
-        test = event.target;
+
         if (event.target.className === 'up' || event.target.className === 'glyphicon glyphicon-arrow-up') {
             player.handleInput(allowedKeys[38]);
         }
@@ -222,6 +248,47 @@ let test;
             player.handleInput(allowedKeys[39]);
         }
 
+
     });
 
 }());
+let pausedX;
+let pausedY;
+let k = false;
+function Screens() {
+    this.canvas = document.querySelector('body');
+    this.x = 0;
+    this.y = 0;
+    this.int = false;
+    this.begin = false;
+}
+
+Screens.prototype.render = function() {
+        ctx.strokeRect(0, 10, 100, 35);
+        ctx.font = '20px serif';
+        ctx.fillText("Pause", 28, 35);
+
+
+}
+
+Screens.prototype.update = function() {
+    this.canvas.addEventListener('click', function(e) {
+    pausedX = e.offsetX;
+    pausedY = e.offsetY;
+    if (pausedX > 0 && pausedX < 100) {
+        if (k === false) {
+            k = true;
+        } else if (k === true) {
+            k = false;
+        }
+    }
+
+    });
+
+}
+
+Screens.prototype.menu = function(el) {
+
+}
+
+const pause = new Screens();
