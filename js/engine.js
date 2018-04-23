@@ -44,7 +44,7 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        //update(dt);
+        update(dt);
         render();
 
         /* Set our lastTime variable which is used to determine the time delta
@@ -79,7 +79,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -149,11 +149,13 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        //allEnemies.forEach(function(enemy) {
-          //  enemy.render();
-        //});
-
+        allEnemies.forEach(function(enemy) {
+            enemy.render();
+        });
+        star.render();
+        rock.render();
         player.render();
+
     }
 
     /* This function does nothing but it could have been a good place to
@@ -173,6 +175,7 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/Rock.png',
+        'images/Star.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
         'images/char-cat-girl.png',
