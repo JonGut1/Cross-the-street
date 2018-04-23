@@ -1,3 +1,46 @@
 body {
+	display: flex;
+	justify-content: center;
     text-align: center;
+    margin: 0px;
+}
+
+@media screen and (max-width: 800px) {
+
+}
+
+.buttonCont {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		position: fixed;
+		z-index: 1;
+		width: 100%;
+		height: 180px;
+		margin-top: 60vh;
+}
+
+.lr {
+	height: 100%;
+	width: 20%;
+	margin-right: 25%;
+}
+
+.ud {
+	height: 100%;
+	width: 20%;
+	margin-left: 25%;
+}
+
+.up, .down, .left, .right {
+	width: 100%;
+	height: 40%;
+	border: 1px solid silver;
+	border-radius: 70px;
+	font-size: 30px;
+}
+
+.up, .left {
+	margin-bottom: 10%;
 }

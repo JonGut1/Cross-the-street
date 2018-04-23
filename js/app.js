@@ -9,12 +9,12 @@ var Enemy = function() {
     for (i = 0; i <= 4; i++) {
         this.gridX.push(i * 101);
     }
-    for (i = 0; i <= 3; i++) {
+    for (i = 0; i <= 5; i++) {
         this.gridY.push(i * 83 + 50);
     }
     this.sprite = 'images/enemy-bug.png';
     this.moveY = Math.floor(Math.random() * 3);
-    this.speed = Math.floor(Math.random() * (200 - 70) + 70);
+    this.speed = Math.floor(Math.random() * (400 - 170) + 170);
     this.coordinatesX = - 101;
     this.coordinatesY = this.gridY[this.moveY];
 
@@ -39,7 +39,13 @@ Enemy.prototype.update = function(dt) {
         this.coordinatesX = -101;
         this.moveY = Math.floor(Math.random() * 3);
         this.coordinatesY = this.gridY[this.moveY];
-        this.speed = Math.floor(Math.random() * (200 - 70) + 70);
+        if (this.speed >= 350)
+        this.speed = Math.floor(Math.random() * (400 - 300) + 300);
+        else if (this.speed < 300 && this.speed >= 250) {
+            this.speed = Math.floor(Math.random() * (299 - 200) + 200);
+        } else {
+            this.speed = Math.floor(Math.random() * (400 - 150) + 150);
+        }
     }
 };
 
@@ -58,11 +64,12 @@ function checkCollisions() {
 }
 
 
+for (let i = 0; i <= 3; i++) {
+    allEnemies.push(new Enemy);
+}
 
 
 
-const enemy = new Enemy();
-allEnemies.push(enemy);
 
 
 // Now write your own player class
@@ -75,7 +82,7 @@ function Player() {
     for (i = 0; i <= 4; i++) {
         this.gridX.push(i * 101);
     }
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i <= 5; i++) {
         this.gridY.push(i * 83 + 50);
     }
     this.char = ['images/char-boy.png',
@@ -171,13 +178,14 @@ Collectibles.prototype.render = function() {
 
 
 const star = new Collectibles();
-const rock = new Collectibles();
 
-const col = function collision(x1, y1, x2, y2) {
+function col(x1, y1, x2, y2) {
     let x = x2 - x1;
     let y = y2 - y1;
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 }
+
+
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -185,13 +193,35 @@ const col = function collision(x1, y1, x2, y2) {
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
+var allowedKeys = {
         37: 'left',
         38: 'up',
         39: 'right',
         40: 'down'
     };
+document.addEventListener('keyup', function(e) {
+
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+let test;
+(function mobileButtons() {
+    const buttons = document.querySelector('.buttonCont');
+    buttons.addEventListener('click', function(event) {
+        test = event.target;
+        if (event.target.className === 'up' || event.target.className === 'glyphicon glyphicon-arrow-up') {
+            player.handleInput(allowedKeys[38]);
+        }
+        if (event.target.className === 'down' || event.target.className === 'glyphicon glyphicon-arrow-down') {
+            player.handleInput(allowedKeys[40]);
+        }
+        if (event.target.className === 'left' || event.target.className === 'glyphicon glyphicon-arrow-left') {
+            player.handleInput(allowedKeys[37]);
+        }
+        if (event.target.className === 'right' || event.target.className === 'glyphicon glyphicon-arrow-right') {
+            player.handleInput(allowedKeys[39]);
+        }
+
+    });
+
+}());

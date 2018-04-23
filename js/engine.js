@@ -153,7 +153,6 @@ var Engine = (function(global) {
             enemy.render();
         });
         star.render();
-        rock.render();
         player.render();
 
     }
