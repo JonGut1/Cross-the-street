@@ -140,7 +140,6 @@ Player.prototype.handleInput = function(press) {
             this.levels += 1;
             this.moveY = 5;
             this.moveX = 2;
-            test = true;
         }
         console.log('up');
         this.moveY -= 1;
@@ -252,15 +251,14 @@ document.addEventListener('keyup', function(e) {
     });
 
 }());
-let pausedX;
-let pausedY;
 let k = false;
 function Screens() {
-    this.canvas = document.querySelector('body');
     this.x = 0;
     this.y = 0;
     this.int = false;
     this.begin = false;
+    this.pausedX;
+    this.pausedY;
 }
 
 Screens.prototype.render = function() {
@@ -272,15 +270,11 @@ Screens.prototype.render = function() {
 }
 
 Screens.prototype.update = function() {
-    this.canvas.addEventListener('click', function(e) {
-    pausedX = e.offsetX;
-    pausedY = e.offsetY;
-    if (pausedX > 0 && pausedX < 100) {
-        if (k === false) {
+    canvas.addEventListener('click', function(e) {
+    this.pausedX = e.offsetX;
+    this.pausedY = e.offsetY;
+    if (this.pausedX < 100 && this.pausedY < 35) {
             k = true;
-        } else if (k === true) {
-            k = false;
-        }
     }
 
     });

@@ -159,6 +159,7 @@ var Engine = (function(global) {
         star.render();
         player.render();
         pause.render();
+        pause.update();
 
     }
 
@@ -167,33 +168,48 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-            render();
-            const body = document.querySelector('body');
-    const modal = document.createElement('modal');
-    modal.classList.add('menu');
-    body.appendChild(modal);
+        let name = [];
+        let variables = [];
+        let numButt = 0;
+        render();
+        const body = document.querySelector('body');
+        const modal = document.createElement('modal');
+        modal.classList.add('menu');
+        body.appendChild(modal);
 
-    console.log('works');
-    const button = document.createElement('button');
-    button.innerHTML = "start";
-    button.classList.add('start');
-    modal.appendChild(button);
+        if (k === false) {
+            name = [];
+            name.push("Quick Game", "Player Select", "Level Select", "Leaderboards");
+            numButt = 4;
+        } else if (k === true) {
+            name = [];
+            name.push("Resume", "Restart", "Quit");
+            numButt = 3;
+        }
 
-    button.addEventListener('click', function(event) {
-    testing = event;
+        for (let i = 0; i < name.length; i++) {
+            variables[i] = document.createElement('button');
+            variables[i].innerHTML = name[i];
+            variables[i].className = name[i];
+            modal.appendChild(variables[i]);
+        }
 
-    modal.style.display = "none";
-    lastTime = Date.now();
+
+        variables[0].addEventListener('click', function(event) {
+        testing = event;
+        modal.style.display = "none";
+        k = false;
+        lastTime = Date.now();
         main();
-
-    });
+        });
         // noop
     }
 
     function pauseSc(el) {
             if (k) {
             win.cancelAnimationFrame(el);
-        }
+            reset();
+            }
     }
 
 
@@ -222,4 +238,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.canvas = canvas;
 })(this);
