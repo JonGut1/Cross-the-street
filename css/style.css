@@ -5,23 +5,15 @@ body {
     margin: 0px;
 }
 
-.menu {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
-}
-
-.start {
-	width: 150px;
-	height: 50px;
-}
-
 .buttonCont {
 	display: none;
 }
 
 .menu {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	align-items: center;
 	position: fixed;
 	z-index: 1;
 	border: 1px solid silver;
@@ -29,10 +21,23 @@ body {
 	height: 538px;
 	margin-top: 50px;
 	background-color: grey;
-	opacity: 0.2;
+	opacity: 0.6;
+	padding-top: 10%;
+	font-size: 20px;
+}
+
+.Quick, .Player, .Level, .Leaderboard, .Resume, .Restart, .Quit {
+	border: 1px solid silver;
+	width: 150px;
+	height: 50px;
+	margin-bottom: 10px;
 }
 
 @media screen and (max-width: 800px) {
+	.menu {
+		padding-top: 20%;
+	}
+
 	.buttonCont {
 		display: flex;
 		flex-wrap: wrap;

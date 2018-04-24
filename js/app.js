@@ -75,6 +75,12 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.coordinatesY);
 };
 
+Enemy.prototype.reset = function() {
+    this.speed = Math.floor(Math.random() * (400 - 170) + 170);
+    this.coordinatesX = - 101;
+    this.coordinatesY = this.gridY[this.moveY];
+};
+
 
 function checkCollisions() {
     allEnemies.forEach(function(el) {
@@ -91,7 +97,7 @@ for (let i = 0; i <= 2; i++) {
 
 
 
-
+let w = false;
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -130,6 +136,9 @@ Player.prototype.update = function() {
         this.moveY = 4;
         this.moveX = 2;
         this.hit = false;
+    }
+    if (this.levels === 4) {
+        w = true;
     }
 };
 
@@ -171,6 +180,13 @@ Player.prototype.handleInput = function(press) {
     this.coordinatesY = this.gridY[this.moveY];
 };
 
+Player.prototype.reset = function() {
+    this.moveY = 4;
+    this.moveX = 2;
+    this.dificulty = 0;
+    this.levels = 0;
+};
+
 var player = new Player();
 
 function Collectibles() {
@@ -199,6 +215,14 @@ Collectibles.prototype.render = function() {
     if (col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
         this.colide = 0;
     }
+};
+
+Collectibles.prototype.reset = function() {
+    this.moveY = Math.floor(Math.random() * 3);;
+    this.moveX = Math.floor(Math.random() * 5);;
+    this.coordinatesX = this.gridX[this.moveX];
+    this.coordinatesY = this.gridY[this.moveY];
+    this.colide = 1;
 };
 
 
@@ -281,8 +305,28 @@ Screens.prototype.update = function() {
 
 }
 
-Screens.prototype.menu = function(el) {
+const pause = new Screens();
 
+function Menus() {
+        this.menus = [];
+        this.menusVar = [];
 }
 
-const pause = new Screens();
+Menus.prototype.menu = function(el) {
+    if (el === "menu") {
+            this.menus = ["Quick Game", "Player Select", "Level Select", "Leaderboard"];
+        } else if (el === "pause") {
+            this.menus = ["Resume", "Restart", "Quit"];
+        } else if (el === "win") {
+            this.menus = ["Restart", "Leaderboard", "Quit"];
+        }
+
+    for (let i = 0; i < this.menus.length; i++) {
+        this.menusVar[i] = document.createElement('button');
+        this.menusVar[i].innerHTML = this.menus[i];
+        this.menusVar[i].className = this.menus[i];
+        modal.appendChild(this.menusVar[i]);
+        }
+};
+
+const menu = new Menus();

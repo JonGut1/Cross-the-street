@@ -159,8 +159,6 @@ var Engine = (function(global) {
         star.render();
         player.render();
         pause.render();
-        pause.update();
-
     }
 
     /* This function does nothing but it could have been a good place to
@@ -168,45 +166,74 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        let name = [];
-        let variables = [];
-        let numButt = 0;
-        render();
+        console.log("testing");
         const body = document.querySelector('body');
         const modal = document.createElement('modal');
         modal.classList.add('menu');
         body.appendChild(modal);
-
-        if (k === false) {
-            name = [];
-            name.push("Quick Game", "Player Select", "Level Select", "Leaderboards");
-            numButt = 4;
+        global.modal = modal;
+        render();
+        if (player.levels === 4) {
+            menu.menu("win");
+        } else if (k === false) {
+            menu.menu("menu");
+            console.log(1);
         } else if (k === true) {
-            name = [];
-            name.push("Resume", "Restart", "Quit");
-            numButt = 3;
+            menu.menu("pause");
+            console.log(2)
         }
 
-        for (let i = 0; i < name.length; i++) {
-            variables[i] = document.createElement('button');
-            variables[i].innerHTML = name[i];
-            variables[i].className = name[i];
-            modal.appendChild(variables[i]);
-        }
+        modal.addEventListener('click', function(event) {
+            const target = event.target.className;
+            if (target === "Quick Game") {
+                 menu.menusVar = [];
+                menu.menus = [];
+                modal.remove();
+                lastTime = Date.now();
+                main();
+            }
+            if (target === "Resume") {
+                modal.remove();
+                k = false;
 
+                lastTime = Date.now();
+                main();
+            }
+            if (target === "Quit") {
+                location.reload();
+            }
+            if (target === "Restart") {
+                k = false;
+                modal.remove();
+                player.reset();
+                allEnemies.forEach(function(enemy) {
+                    enemy.reset();
+                });
+                allEnemies = [];
+                for (let i = 0; i <= 2; i++) {
+                    allEnemies.push(new Enemy);
+                }
+                star.reset();
+                lastTime = Date.now();
+                main();
+            }
+            if (target === "Player Select") {
 
-        variables[0].addEventListener('click', function(event) {
-        testing = event;
-        modal.style.display = "none";
-        k = false;
-        lastTime = Date.now();
-        main();
+            }
         });
+
+
+
         // noop
     }
 
     function pauseSc(el) {
-            if (k) {
+        if (player.levels === 4) {
+            win.cancelAnimationFrame(el);
+            reset();
+        }
+            if (k === true) {
+                console.log(4);
             win.cancelAnimationFrame(el);
             reset();
             }
@@ -239,4 +266,5 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
     global.canvas = canvas;
+
 })(this);
