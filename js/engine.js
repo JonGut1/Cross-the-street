@@ -12,14 +12,15 @@
  * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
-
+let te = 2;
 let testing;
+let start = true;
+let set;
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
-
     var doc = global.document,
         win = global.window,
         canvas = doc.createElement('canvas'),
@@ -96,8 +97,12 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
         player.update();
+        star.update();
+        heart.update();
         pause.update();
+        hearts.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -156,9 +161,12 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
+        heart.render();
         star.render();
         player.render();
+        hearts.render();
         pause.render();
+
     }
 
     /* This function does nothing but it could have been a good place to
@@ -166,29 +174,45 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        console.log("testing");
         const body = document.querySelector('body');
         const modal = document.createElement('modal');
         modal.classList.add('menu');
         body.appendChild(modal);
         global.modal = modal;
         render();
-        if (player.levels === 4) {
+
+        if (player.levels === 10) {
             menu.menu("win");
-        } else if (k === false) {
+        }
+        if (start === true) {
             menu.menu("menu");
+            start = false;
             console.log(1);
-        } else if (k === true) {
+        }
+        if (k === true) {
             menu.menu("pause");
             console.log(2)
+        }
+        if (hearts.hearts === 0) {
+            menu.menu("lost");
         }
 
         modal.addEventListener('click', function(event) {
             const target = event.target.className;
             if (target === "Quick Game") {
-                 menu.menusVar = [];
+                menu.menusVar = [];
                 menu.menus = [];
                 modal.remove();
+                player.reset();
+                allEnemies.forEach(function(enemy) {
+                    enemy.reset();
+                });
+                allEnemies = [];
+                for (let i = 0; i <= 2; i++) {
+                    allEnemies.push(new Enemy);
+                }
+                star.reset(true);
+                hearts.reset(true);
                 lastTime = Date.now();
                 main();
             }
@@ -213,30 +237,73 @@ var Engine = (function(global) {
                 for (let i = 0; i <= 2; i++) {
                     allEnemies.push(new Enemy);
                 }
-                star.reset();
+                star.reset(true);
+                hearts.reset(true);
                 lastTime = Date.now();
                 main();
             }
             if (target === "Player Select") {
 
+                modal.remove();
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                playerSelect();
             }
         });
-
-
 
         // noop
     }
 
+    function playerSelect() {
+            requestAnimationFrame(playerSelect);
+            ctx.fillStyle = "#A9BCF5";
+            ctx.fillRect(0,50,canvas.width,canvas.height - 70);
+            ctx.ellipse(250, 380, 20, 75, 90 * Math.PI/180, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            char1.render();
+            char1.update();
+            char2.render();
+            char2.update();
+            char3.render();
+            char3.update();
+            char4.render();
+            char4.update();
+            char5.render();
+            char5.update();
+
+            ctx.fillStyle = "green";
+            ctx.fillRect(350, 400, 100, 100);
+            ctx.font = '20px serif';
+            ctx.fillStyle = "white";
+            ctx.fillText("NEXT", 373, 455);
+
+            canvas.addEventListener('click', function(e) {
+            const pausedX = e.offsetX;
+            const pausedY = e.offsetY;
+        if (pausedX > 350 && pausedY > 400) {
+            console.log(9001);
+            char1.check();
+            char2.check();
+            char3.check();
+            char4.check();
+            char5.check();
+        }
+    });
+}
+
     function pauseSc(el) {
-        if (player.levels === 4) {
+        if (player.levels === 10) {
             win.cancelAnimationFrame(el);
             reset();
         }
-            if (k === true) {
-                console.log(4);
+        if (hearts.hearts === 0) {
             win.cancelAnimationFrame(el);
             reset();
-            }
+        }
+        if (k === true) {
+            win.cancelAnimationFrame(el);
+            reset();
+        }
     }
 
 
@@ -251,6 +318,7 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/Rock.png',
         'images/Star.png',
+        'images/Heart.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
         'images/char-cat-girl.png',
