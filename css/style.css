@@ -10,6 +10,19 @@ body {
 	display: none;
 }
 
+.inputDiv {
+	position: fixed;
+	z-index: 1;
+	height: 50px;
+	width: 130px;
+	margin-top: 33.5%;
+}
+
+.input {
+	width: 80%;
+	text-align: center;
+}
+
 .menu {
 	display: flex;
 	flex-wrap: wrap;

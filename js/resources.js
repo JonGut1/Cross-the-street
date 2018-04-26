@@ -46,6 +46,7 @@
              * within our cache; we'll need to load this image.
              */
             var img = new Image();
+
             img.onload = function() {
                 /* Once our image has properly loaded, add it to our cache
                  * so that we can simply return this image if the developer
