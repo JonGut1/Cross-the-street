@@ -101,7 +101,7 @@ var Engine = (function(global) {
         player.update();
         star.update();
         heart.update();
-        pause.update();
+        pause.update('pause');
         hearts.update();
     }
 
@@ -254,11 +254,72 @@ var Engine = (function(global) {
     }
 
     function playerSelect() {
-            requestAnimationFrame(playerSelect);
+            canvas.addEventListener('click', function(e) {
+            const pausedX = e.offsetX;
+            const pausedY = e.offsetY;
+        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 500) {
+            console.log(9001);
+            char1.check(true);
+            char2.check(true);
+            char3.check(true);
+            char4.check(true);
+            char5.check(true);
+        }
+
+        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 500) {
+            console.log(9001);
+            char1.check(false);
+            char2.check(false);
+            char3.check(false);
+            char4.check(false);
+            char5.check(false);
+        }
+    });
+        selectUpdate();
+}
+
+    function selectUpdate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height)
             ctx.fillStyle = "#A9BCF5";
             ctx.fillRect(0,50,canvas.width,canvas.height - 70);
-            ctx.ellipse(250, 380, 20, 75, 90 * Math.PI/180, 0, 2 * Math.PI);
+
+
+            ctx.fillStyle = "#F5D0A9";
+            ctx.beginPath();
+            ctx.ellipse(250, 450, 40, 70, 90 * Math.PI/180, 0, 2 * Math.PI);
+            ctx.fill();
             ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(175, 380);
+            ctx.lineWidth = 2;
+            ctx.lineTo(180, 450);
+            ctx.lineTo(320, 450);
+            ctx.lineTo(325, 380);
+            ctx.lineTo(175, 380);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.moveTo(175, 380);
+            ctx.lineTo(180, 450);
+            ctx.stroke();
+            ctx.moveTo(320, 450);
+            ctx.lineTo(325, 380);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(250, 380, 40, 75, 90 * Math.PI/180, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "green";
+            ctx.fillRect(350, 400, 100, 100);
+            ctx.fillRect(50, 400, 100, 100);
+            ctx.font = '20px serif';
+            ctx.fillStyle = "white";
+            ctx.fillText("NEXT", 373, 455);
+            ctx.fillText("PREVIOUS", 73, 455);
 
             char1.render();
             char1.update();
@@ -271,25 +332,14 @@ var Engine = (function(global) {
             char5.render();
             char5.update();
 
-            ctx.fillStyle = "green";
-            ctx.fillRect(350, 400, 100, 100);
-            ctx.font = '20px serif';
-            ctx.fillStyle = "white";
-            ctx.fillText("NEXT", 373, 455);
+            pause.update('back');
+            pause.render();
+            if (b === true) {
+                console.log(00);
+            }
 
-            canvas.addEventListener('click', function(e) {
-            const pausedX = e.offsetX;
-            const pausedY = e.offsetY;
-        if (pausedX > 350 && pausedY > 400) {
-            console.log(9001);
-            char1.check();
-            char2.check();
-            char3.check();
-            char4.check();
-            char5.check();
-        }
-    });
-}
+            requestAnimationFrame(selectUpdate);
+    }
 
     function pauseSc(el) {
         if (player.levels === 10) {

@@ -325,6 +325,7 @@ document.addEventListener('keyup', function(e) {
 
 
 let k = false;
+let b = false;
 function Tab(type, x, y, width, height) {
     this.pausedX;
     this.pausedY;
@@ -355,13 +356,20 @@ Tab.prototype.render = function() {
     }
 };
 
-Tab.prototype.update = function() {
+Tab.prototype.update = function(el) {
     canvas.addEventListener('click', function(e) {
     this.pausedX = e.offsetX;
     this.pausedY = e.offsetY;
+    if (el === 'pause') {
         if (this.pausedX < 100 && this.pausedY < 50) {
             k = true;
         }
+    } else if (el === 'back') {
+        if (this.pausedX < 100 && this.pausedY < 50) {
+            b = true;
+        }
+    }
+
     });
 
     if (this.type === "hearts") {
@@ -414,14 +422,25 @@ function Select(x, y, width, height, num) {
     this.y = y;
     this.width = width;
     this.height = height;
-    this.first = [150, 120, 70, 140];
-    this.second = [50, 150, 100, 200];
-    this.third = [150, 100, 200, 350];
-    this.forth = [350, 150, 100, 200];
-    this.fith = [300, 120, 70, 140];
-    this.arr = [];
+    this.tagArr = [];
+    this.first = [1, 150, 25, 75, 150];
+    this.second = [2, 50, 100, 100, 200];
+    this.third = [3, 150, 100, 200, 350];
+    this.forth = [4, 350, 100, 100, 200];
+    this.fith = [5, 300, 25, 75, 150];
+    this.tagArr.push(this.first, this.second, this.third, this.forth, this.fith);
+    this.arr = [x, y, width, height];
     this.tag;
-    this.test = this.first;
+    this.mark = 0;
+    this.move = false;
+
+    this.mX;
+    this.mY;
+    this.mW;
+    this.mH;
+    this.remXBy;
+    this.count;
+
 }
 
 Select.prototype.render = function() {
@@ -429,27 +448,84 @@ Select.prototype.render = function() {
 };
 
 Select.prototype.update = function() {
-    char1.x - char2.x;
-    char2.x - char3.x;
-    char4.x - char5.x;
-    char5.x - char1.x;
+    if (this.move === true && this.count > 0) {
+        this.x -= (this.moveXBy / 25); // 4
+        this.y -= (this.moveYBy / 25); //-1
+        this.width -= (this.widthBy / 25); //-1
+        this.height -= (this.heightBy / 25); //-2
+        this.count -= 4;
+    }
+
+};
+
+Select.prototype.check = function(el) {
     this.arr = [this.x, this.y, this.width, this.height];
-};
-
-Select.prototype.check = function() {
-        if (this.arr[0] === this.test[0] && this.arr[1] === this.test[1] &&
-            this.arr[2] === this.test[2] && this.arr[3] === this.test[3] &&
-            this.arr[4] === this.test[4]) {
-        } else {
-            return;
+    this.mark = 0;
+    this.generator = this.return();
+    while (this.mark === 0) {
+        this.test = this.generator.next();
+        if (this.arr[0] === this.test.value[1] && this.arr[1] === this.test.value[2] &&
+            this.arr[2] === this.test.value[3] && this.arr[3] === this.test.value[4] &&
+            this.arr[4] === this.test.value[5]) {
+            this.tag = this.test.value[0];
+            this.mark = 1;
+            console.log(this.tag + " taged");
         }
+    }
+    this.cycle(el);
+    this.move = true;
+    this.count = 100;
+    console.log(this.moveXBy);
 };
 
-const char1 = new Select(150, 120, 70, 140, 0);
-const char2 = new Select(50, 150, 100, 200, 1);
+Select.prototype.return = function*() {
+    yield this.first;
+    yield this.second;
+    yield this.third;
+    yield this.forth;
+    yield this.fith;
+};
+
+Select.prototype.cycle = function(el) {
+    if (el === true) {
+        for (i = 0; i < 5; i++) {
+
+            if (this.tag === this.tagArr[i][0]) {
+                if (this.tag === 5) {
+                    this.increment = this.tagArr[0];
+                } else {
+                    this.increment = this.tagArr[i + 1];
+                }
+                this.moveXBy = this.tagArr[i][1] - this.increment[1];
+                this.moveYBy = this.tagArr[i][2] - this.increment[2];
+                this.widthBy = this.tagArr[i][3] - this.increment[3];
+                this.heightBy = this.tagArr[i][4] - this.increment[4];
+            }
+        }
+    } else if (el === false) {
+        for (i = 4; i >= 0; i--) {
+
+            if (this.tag === this.tagArr[i][0]) {
+                if (this.tag === 1) {
+                    this.increment = this.tagArr[4];
+                } else {
+                    this.increment = this.tagArr[i - 1];
+                }
+                this.moveXBy = this.tagArr[i][1] - this.increment[1];
+                this.moveYBy = this.tagArr[i][2] - this.increment[2];
+                this.widthBy = this.tagArr[i][3] - this.increment[3];
+                this.heightBy = this.tagArr[i][4] - this.increment[4];
+            }
+        }
+    }
+};
+
+
+const char1 = new Select(150, 25, 75, 150, 0);
+const char2 = new Select(50, 100, 100, 200, 1);
 const char3 = new Select(150, 100, 200, 350, 2);
-const char4 = new Select(350, 150, 100, 200, 3);
-const char5 = new Select(300, 120, 70, 140, 4);
+const char4 = new Select(350, 100, 100, 200, 3);
+const char5 = new Select(300, 25, 75, 150, 4);
 
 
 
