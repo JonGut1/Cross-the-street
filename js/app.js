@@ -1,6 +1,5 @@
 // Enemies our player must avoid
 let allEnemies = [];
-let test = false;
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -125,19 +124,25 @@ function Player() {
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
         'images/char-princess-girl.png'];
-    this.random = Math.floor(Math.random() * 5);
+    this.random = Math.floor(Math.random() * 4);
     this.moveY = 4;
     this.moveX = 2;
     this.coordinatesX = this.gridX[this.moveX];
     this.coordinatesY = this.gridY[this.moveY];
     this.dificulty = 0;
     this.levels = 0;
-    this.randomMovement = ["up", "down", "left", "right"];
+    this.continue = false;
 };
 
 
 Player.prototype.render = function() {
-  ctx.drawImage(Resources.get(this.sprite[this.random]), this.gridX[this.moveX], this.gridY[this.moveY]);
+    this.localSprite = localStorage.Recent_Character;
+    if (this.localSprite != undefined && this.continue === true) {
+        ctx.drawImage(Resources.get(this.sprite[parseInt(this.localSprite)]), this.gridX[this.moveX], this.gridY[this.moveY]);
+    } else {
+        ctx.drawImage(Resources.get(this.sprite[this.random]), this.gridX[this.moveX], this.gridY[this.moveY]);
+    }
+
 };
 
 Player.prototype.update = function() {
@@ -400,15 +405,49 @@ function Menus() {
         this.menusVar = [];
 }
 
+Menus.prototype.inputField = function(el) {
+    if (el === "win") {
+        this.text = "Congratulations you won!!!!"
+        this.class = 'textWin';
+    } else {
+        this.text = "You lost, try again!!!!";
+        this.class = 'textLose';
+    }
+    const menu = document.querySelector('.menu');
+    const inputDiv = document.createElement('div');
+    inputDiv.classList.add('nameDiv');
+    menu.appendChild(inputDiv);
+
+    const textDiv = document.createElement('div');
+    textDiv.classList.add('textDiv');
+    inputDiv.appendChild(textDiv);
+
+    const text = document.createElement('span');
+    text.classList.add(this.class);
+    text.innerHTML = this.text;
+    textDiv.appendChild(text);
+    if (el === "lost") {
+        return;
+    }
+    const input = document.createElement('input');
+    input.classList.add('nameInput');
+    inputDiv.appendChild(input);
+};
+
 Menus.prototype.menu = function(el) {
     if (el === "menu") {
-            this.menus = ["Quick Game", "Player Select", "Level Select", "Leaderboard"];
+            this.menus = ["Quick Game", "Player Select", "Leaderboard"];
+            if (player.localSprite != undefined) {
+                this.menus.unshift("Continue");
+            }
         } else if (el === "pause") {
             this.menus = ["Resume", "Restart", "Quit"];
         } else if (el === "win") {
-            this.menus = ["Restart", "Leaderboard", "Quit"];
+            this.menus = ["Submit", "Restart", "Leaderboard", "Quit"];
+            this.inputField("win");
         } else if (el === "lost") {
             this.menus = ["Restart", "Leaderboard", "Quit"];
+            this.inputField("lost");
         }
 
     for (let i = 0; i < this.menus.length; i++) {
@@ -477,6 +516,9 @@ Select.prototype.check = function(el) {
             this.mark = 1;
             console.log(this.tag + " taged");
         }
+    }
+    if (el === null) {
+        return;
     }
     this.cycle(el);
     this.move = true;
@@ -556,9 +598,56 @@ const char3 = new Select(150, 100, 200, 350, 2);
 const char4 = new Select(350, 100, 100, 200, 3);
 const char5 = new Select(300, 25, 75, 150, 4);
 
+function Data() {
+    this.storage1 = "Recent_Character";
+    this.storage2 = "Player_Name";
+    this.tag;
+    this.tagArr = [char1, char2, char3, char4, char5];
+    this.stringTag = ["char1", "char2", "char3", "char4", "char5"];
+    this.timesPlayed = localStorage.TimesPlayed;
+}
+
+Data.prototype.insert = function(el) {
+    for (let i = 0; i < this.tagArr.length; i++) {
+        this.tagArr[i].check(null);
+    }
+    for (let i = 0; i < this.tagArr.length; i++) {
+        if (this.tagArr[i].tag === 3) {
+            this.tag = this.tagArr[i].num;
+        }
+    }
+    if (el === "random") {
+        this.tag = player.random;
+    }
+    if (this.timesPlayed === undefined) {
+        this.timesPlayed = 1;
+    } else {
+        this.int = parseInt(this.timesPlayed);
+        this.int += 1;
+        this.timesPlayed = this.int;
+    }
+    this.input = document.querySelector('input');
+    localStorage.setItem("TimesPlayed", this.timesPlayed)
+    localStorage.setItem(this.timesPlayed, this.stringTag);
+    localStorage.setItem(this.storage1, this.tag);
+    localStorage.setItem(this.storage2, this.input.value);
+    this.tag = parseInt(this.tag);
+};
+
+Data.prototype.display = function() {
+    if (this.timesPlayed > 0) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#A9BCF5";
+        ctx.fillRect(0,50,canvas.width,canvas.height - 70);
+        this.chars = localStorage.Recent_Character;
+        this.names = localStorage.Player_Name;
+        ctx.drawImage(Resources.get(player.sprite[parseInt(this.chars)]), 170, 0, 150, 250);
+    }
+
+};
 
 
-
+const data = new Data();
 
 
 

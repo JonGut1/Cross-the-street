@@ -186,7 +186,7 @@ var Engine = (function(global) {
         global.modal = modal;
         render();
 
-        if (player.levels === 10) {
+        if (player.levels === 2) {
             menu.menu("win");
         }
         if (start === true) {
@@ -256,9 +256,42 @@ var Engine = (function(global) {
                 q = 1;
                 playerSelect();
             }
+            if (target === "Continue") {
+                player.continue = true;
+                b = false;
+                console.log(12);
+                menu.menusVar = [];
+                menu.menus = [];
+                modal.remove();
+                player.reset();
+                allEnemies.forEach(function(enemy) {
+                    enemy.reset();
+                });
+                allEnemies = [];
+                for (let i = 0; i <= 2; i++) {
+                    allEnemies.push(new Enemy);
+                }
+                star.reset(true);
+                hearts.reset(true);
+                lastTime = Date.now();
+                main();
+            }
+            if (target === "Submit") {
+                data.insert("random");
+            }
+            if (target === "Leaderboard") {
+                modal.remove();
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                leaderboards();
+            }
         });
 
         // noop
+    }
+
+    function leaderboards() {
+        data.display();
+        win.requestAnimationFrame(leaderboards);
     }
 
     function playerSelect() {
@@ -294,6 +327,7 @@ var Engine = (function(global) {
 
         if (pausedX > 200 && pausedX < 300 && pausedY > 500 && pausedY < 550) {
             console.log("works");
+            data.insert();
             b = true;
         }
     });
@@ -371,7 +405,7 @@ var Engine = (function(global) {
     }
 
     function pauseSc(el) {
-        if (player.levels === 10) {
+        if (player.levels === 2) {
             win.cancelAnimationFrame(el);
             reset();
         }
@@ -389,6 +423,7 @@ var Engine = (function(global) {
             rem.remove();
             q = 0;
             ctx.clearRect(0,0,canvas.width,canvas.height)
+            player.continue = true;
             reset();
         }
         if (c === true) {
