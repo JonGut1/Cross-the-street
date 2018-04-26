@@ -39,13 +39,47 @@ body {
 	font-size: 20px;
 }
 
-.Quick, .Player, .Level, .Leaderboard, .Resume, .Restart, .Quit {
+.Quick, .Player, .Level, .Leaderboard, .Resume, .Restart, .Quit, .Continue {
 	border: 1px solid silver;
 	width: 150px;
 	height: 50px;
 	margin-bottom: 10px;
 	background-color: white;
 	opacity: 0.7;
+}
+
+.Submit {
+	border: 2px solid silver;
+	width: 170px;
+	height: 70px;
+	margin-bottom: 10px;
+	background-color: #82FA58;
+	opacity: 0.7;
+}
+
+.nameDiv {
+	margin-bottom: 10px;
+	height: 100px;
+}
+
+.nameInput {
+	text-align: center;
+	opacity: 0.7;
+	font-style: bold;
+}
+
+.textWin {
+	font-size: 30px;
+	color: white;
+}
+
+.textLose {
+	font-size: 30px;
+	color: red;
+}
+
+.textDiv {
+	margin-bottom: 10px;
 }
 
 @media screen and (max-width: 800px) {
