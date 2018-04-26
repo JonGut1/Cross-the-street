@@ -65,6 +65,15 @@ body {
 		margin-top: 60vh;
 	}
 
+	.inputDiv {
+	margin-top: 57%;
+}
+
+.input {
+	width: 80%;
+	text-align: center;
+}
+
 	.ud {
 		height: 100%;
 		width: 10%;
