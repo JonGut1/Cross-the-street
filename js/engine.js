@@ -16,6 +16,8 @@ let te = 2;
 let testing;
 let start = true;
 let set;
+let c = false;
+let q = 0;
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -100,8 +102,9 @@ var Engine = (function(global) {
 
         player.update();
         star.update();
+        key.update();
         heart.update();
-        pause.update('pause');
+        pause.update();
         hearts.update();
     }
 
@@ -163,6 +166,7 @@ var Engine = (function(global) {
         });
         heart.render();
         star.render();
+        key.render();
         player.render();
         hearts.render();
         pause.render();
@@ -177,6 +181,7 @@ var Engine = (function(global) {
         const body = document.querySelector('body');
         const modal = document.createElement('modal');
         modal.classList.add('menu');
+        ctx.clearRect(0,0,canvas.width,canvas.height)
         body.appendChild(modal);
         global.modal = modal;
         render();
@@ -191,6 +196,8 @@ var Engine = (function(global) {
         }
         if (k === true) {
             menu.menu("pause");
+            start = false;
+            k = false;
             console.log(2)
         }
         if (hearts.hearts === 0) {
@@ -199,7 +206,9 @@ var Engine = (function(global) {
 
         modal.addEventListener('click', function(event) {
             const target = event.target.className;
-            if (target === "Quick Game") {
+            if (target === "Quick Game" || b === true) {
+                b = false;
+                console.log(12);
                 menu.menusVar = [];
                 menu.menus = [];
                 modal.remove();
@@ -243,9 +252,8 @@ var Engine = (function(global) {
                 main();
             }
             if (target === "Player Select") {
-
                 modal.remove();
-                ctx.clearRect(0,0,canvas.width,canvas.height);
+                q = 1;
                 playerSelect();
             }
         });
@@ -254,10 +262,11 @@ var Engine = (function(global) {
     }
 
     function playerSelect() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             canvas.addEventListener('click', function(e) {
             const pausedX = e.offsetX;
             const pausedY = e.offsetY;
-        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 500) {
+        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 450) {
             console.log(9001);
             char1.check(true);
             char2.check(true);
@@ -266,7 +275,7 @@ var Engine = (function(global) {
             char5.check(true);
         }
 
-        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 500) {
+        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 450) {
             console.log(9001);
             char1.check(false);
             char2.check(false);
@@ -274,7 +283,21 @@ var Engine = (function(global) {
             char4.check(false);
             char5.check(false);
         }
+
+        if (pausedX < 100 && pausedY < 50) {
+            if (q === 1) {
+                c = true;
+                q = 0;
+                console.log(7);
+            }
+        }
+
+        if (pausedX > 200 && pausedX < 300 && pausedY > 500 && pausedY < 550) {
+            console.log("works");
+            b = true;
+        }
     });
+            input();
         selectUpdate();
 }
 
@@ -314,12 +337,14 @@ var Engine = (function(global) {
             ctx.stroke();
 
             ctx.fillStyle = "green";
-            ctx.fillRect(350, 400, 100, 100);
-            ctx.fillRect(50, 400, 100, 100);
+            ctx.fillRect(350, 400, 100, 50);
+            ctx.fillRect(50, 400, 100, 50);
+            ctx.fillRect(200, 500, 100, 50);
             ctx.font = '20px serif';
             ctx.fillStyle = "white";
-            ctx.fillText("NEXT", 373, 455);
-            ctx.fillText("PREVIOUS", 73, 455);
+            ctx.fillText("NEXT", 373, 430);
+            ctx.fillText("PREV", 73, 430);
+            ctx.fillText("SUBMIT", 212, 530);
 
             char1.render();
             char1.update();
@@ -332,13 +357,17 @@ var Engine = (function(global) {
             char5.render();
             char5.update();
 
-            pause.update('back');
-            pause.render();
-            if (b === true) {
-                console.log(00);
+            ctx.fillStyle = "black";
+            ctx.strokeRect(0, 10, 100, 35);
+            ctx.font = '20px serif';
+            ctx.fillText("Back", 28, 35);
+
+            const anim = win.requestAnimationFrame(selectUpdate);
+            if (b === true || c === true) {
+                const rem = document.querySelector('.inputDiv');
+                pauseSc(anim);
             }
 
-            requestAnimationFrame(selectUpdate);
     }
 
     function pauseSc(el) {
@@ -353,6 +382,23 @@ var Engine = (function(global) {
         if (k === true) {
             win.cancelAnimationFrame(el);
             reset();
+        }
+        if (b === true) {
+            win.cancelAnimationFrame(el);
+            const rem = document.querySelector('.inputDiv');
+            rem.remove();
+            q = 0;
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+            reset();
+        }
+        if (c === true) {
+            win.cancelAnimationFrame(el);
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+            const rem = document.querySelector('.inputDiv');
+            rem.remove();
+            start = true;
+            c = false;
+            init();
         }
     }
 
@@ -369,6 +415,7 @@ var Engine = (function(global) {
         'images/Rock.png',
         'images/Star.png',
         'images/Heart.png',
+        'images/Key.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
         'images/char-cat-girl.png',
