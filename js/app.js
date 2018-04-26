@@ -160,8 +160,9 @@ Player.prototype.handleInput = function(press) {
             this.levels += 1;
             this.moveY = 5;
             this.moveX = 2;
-            star.reset(false);
-            heart.reset(false);
+            heart.randomSpawn = Math.floor(Math.random() * 4);
+            star.reset(true);
+            heart.reset(true);
         }
         console.log('up');
         this.moveY -= 1;
@@ -208,7 +209,8 @@ const player = new Player();
 function Collectibles(type) {
     this.gridX = [];
     this.gridY = [];
-    this.typeArr = ["Star", "Heart"];
+    this.typeArr = [];
+    this.typeArr.push(type);
     this.type = type;
     for (i = 0; i <= 4; i++) {
         this.gridX.push(i * 101);
@@ -224,40 +226,40 @@ function Collectibles(type) {
     }
     this.moveY = Math.floor(Math.random() * 3);
     this.moveX = Math.floor(Math.random() * (5 - 1) + 1);
-    this.heartSpawn = 0;
-    this.starSpawn = 1;
-    this.randomSpawn = Math.floor(Math.random() * 3);
+    this.randomSpawn;
     this.coordinatesX = this.gridX[this.moveX];
     this.coordinatesY = this.gridY[this.moveY];
     this.colide = 1;
+    this.heartSpawn = 0;
+    this.starSpawn = 0;
+    this.keySpawn = 1;
+    this.amount;
+    this.score = 0;
+
+    this.starArr = [];
 };
 
 Collectibles.prototype.render = function() {
-    if (this.colide === 1) {
-        if (this.type === 'Star' && this.starSpawn === 1) {
-            ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.gridY[this.moveY]);
-        }
-        if (this.type === 'Heart' && this.heartSpawn === 1) {
-            ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.gridY[this.moveY]);
-        }
-    } else {
-        return;
+    if (this.colide === 1 && this.type === "Heart" && this.heartSpawn === 1) {
+        ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.gridY[this.moveY]);
     }
-    if (col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
-        this.colide = 0;
-        if (heart.colide === 0) {
-            hearts.hearts += 1;
-        }
+    if (this.colide === 1 && this.type === "Star" && this.starSpawn === 1) {
+        ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.gridY[this.moveY]);
     }
 };
 
 Collectibles.prototype.update = function() {
-    if (hearts.hearts < 3 && heart.randomSpawn === 1) {
-        this.starSpawn = 0;
-        this.heartSpawn = 1;
-    } else if (hearts.hearts <= 3 && heart.randomSpawn != 1){
-        this.starSpawn = 1;
-        this.heartSpawn = 0;
+    if (this.type === "Heart"  && this.heartSpawn === 1 && col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
+            console.log("Heart");
+            hearts.hearts += 1;
+            this.colide = 0;
+            this.coordinatesX, this.coordinatesY = -9001
+    }
+    if (this.type === "Star" && this.starSpawn === 1 && col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
+        console.log("Star");
+        this.colide = 0;
+        this.score += 1;
+        this.coordinatesX, this.coordinatesY = -9001
     }
 };
 
@@ -265,19 +267,27 @@ Collectibles.prototype.update = function() {
 Collectibles.prototype.reset = function(el) {
     this.moveY = Math.floor(Math.random() * 3);
     this.moveX = Math.floor(Math.random() * (5 - 1) + 1);
-    this.randomSpawn = Math.floor(Math.random() * 3);
     this.coordinatesX = this.gridX[this.moveX];
     this.coordinatesY = this.gridY[this.moveY];
     this.colide = 1;
     if (el === true) {
-        this.starSpawn = 1;
+        if (hearts.hearts === 3) {
         this.heartSpawn = 0;
+        this.starSpawn = 1;
+        } else if (hearts.hearts < 3 && heart.randomSpawn === 1) {
+        this.starSpawn = 0;
+        this.heartSpawn = 1;
+        } else {
+            this.starSpawn = 1;
+            this.heartSpawn = 0;
+        }
     }
 };
 
 
 const star = new Collectibles('Star');
 const heart = new Collectibles('Heart');
+const key = new Collectibles('Key');
 
 
 
@@ -347,6 +357,7 @@ Tab.prototype.render = function() {
         ctx.font = '20px serif';
         ctx.fillText("Pause", 28, 35);
     }
+
     if (this.type === "hearts") {
         for (let i = 1; i <= this.hearts; i++) {
             ctx.drawImage(Resources.get(this.sprite), this.x + this.heartsX, this.y, this.width, this.height);
@@ -357,21 +368,16 @@ Tab.prototype.render = function() {
 };
 
 Tab.prototype.update = function(el) {
-    canvas.addEventListener('click', function(e) {
-    this.pausedX = e.offsetX;
-    this.pausedY = e.offsetY;
-    if (el === 'pause') {
-        if (this.pausedX < 100 && this.pausedY < 50) {
-            k = true;
-        }
-    } else if (el === 'back') {
-        if (this.pausedX < 100 && this.pausedY < 50) {
-            b = true;
-        }
+    if (this.type === "button") {
+        canvas.addEventListener('click', function(e) {
+        this.pausedX = e.offsetX;
+        this.pausedY = e.offsetY;
+            if (this.pausedX < 100 && this.pausedY < 50) {
+              k = true;
+              console.log(5);
+            }
+        });
     }
-
-    });
-
     if (this.type === "hearts") {
             if (this.hearts < 0) {
                 this.hearts = 0;
@@ -519,6 +525,29 @@ Select.prototype.cycle = function(el) {
         }
     }
 };
+
+const input = function() {
+    const body = document.querySelector('body');
+
+    const inputDiv = document.createElement('div');
+    inputDiv.classList.add('inputDiv');
+    body.appendChild(inputDiv);
+
+    const name = document.createElement('input');
+    name.classList.add('input');
+    name.placeholder = "Name";
+    name.value = "";
+    inputDiv.appendChild(name);
+    name.addEventListener('keydown', function(e) {
+        keyCode = e.keyCode;
+        if (e.keyCode == 13 || e.which == 13) {
+            submit(name.value);
+        }
+    });
+};
+function submit(name) {
+    console.log(name);
+}
 
 
 const char1 = new Select(150, 25, 75, 150, 0);
