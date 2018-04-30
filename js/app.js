@@ -377,27 +377,21 @@ Tab.prototype.paused = function(e) {
 };
 
 Tab.prototype.timerStart = function() {
-    this.hours = new Date().getHours();
-    this.minutes = new Date().getMinutes();
-    this.seconds = new Date().getSeconds();
-    this.startPoint = (this.hours * 120) + (this.minutes * 60) + this.seconds;
+    this.seconds = Date.now() / 1000;
+    this.startPoint = this.seconds;
 };
 
 Tab.prototype.timerEnd = function() {
-    this.h = new Date().getHours();
-    this.m = new Date().getMinutes();
-    this.s = new Date().getSeconds();
-    this.endPoint = (this.h * 120) + (this.m * 60) + this.s;
+    this.s = Date.now() / 1000;
+    this.endPoint = this.s;
     return this.endPoint - this.startPoint;
 };
 
 Tab.prototype.timerCompensate = function() {
-    this.ho = new Date().getHours();
-    this.mi = new Date().getMinutes();
-    this.se = new Date().getSeconds();
-    this.end = (this.h * 120) + (this.m * 60) + this.s;
-    this.compensate = this.endPoint - this.startPoint;
-    this.startPoint = this.startPoint + this.compensate;
+    this.se = Date.now() / 1000;
+    this.end = this.se;
+    this.compensate = this.end - this.endPoint;
+    this.startPoint += this.compensate;
 };
 
 const pause = new Tab("button", 0, 10, 100, 35);
