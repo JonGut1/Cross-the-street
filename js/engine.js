@@ -12,12 +12,7 @@
  * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
-let te = 2;
-let testing;
 let start = true;
-let set;
-let c = false;
-let q = 0;
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -104,8 +99,8 @@ var Engine = (function(global) {
         star.update();
         key.update();
         heart.update();
-        pause.update();
         hearts.update();
+        timer.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -170,6 +165,7 @@ var Engine = (function(global) {
         player.render();
         hearts.render();
         pause.render();
+        timer.render();
 
     }
 
@@ -181,38 +177,29 @@ var Engine = (function(global) {
         const body = document.querySelector('body');
         const modal = document.createElement('modal');
         modal.classList.add('menu');
+        modal.style.background = "rgba(0, 0, 0, 0.4)";
         ctx.clearRect(0,0,canvas.width,canvas.height)
         body.appendChild(modal);
         global.modal = modal;
         render();
-
-        if (player.levels === 2) {
-            menu.menu("win");
-        }
+        modal.addEventListener('click', menuButtons);
         if (start === true) {
             menu.menu("menu");
             start = false;
             console.log(1);
         }
-        if (k === true) {
-            menu.menu("pause");
-            start = false;
-            k = false;
-            console.log(2)
-        }
-        if (hearts.hearts === 0) {
-            menu.menu("lost");
-        }
-
-        modal.addEventListener('click', function(event) {
-            const target = event.target.className;
-            if (target === "Quick Game" || b === true) {
-                b = false;
+    }
+    function playState() {
                 console.log(12);
+                pause.k = false;
                 menu.menusVar = [];
                 menu.menus = [];
                 modal.remove();
                 player.reset();
+                star.reset(true);
+                star.reset(false);
+                heart.reset();
+                timer.timerStart();
                 allEnemies.forEach(function(enemy) {
                     enemy.reset();
                 });
@@ -220,15 +207,19 @@ var Engine = (function(global) {
                 for (let i = 0; i <= 2; i++) {
                     allEnemies.push(new Enemy);
                 }
-                star.reset(true);
-                hearts.reset(true);
+                canvas.addEventListener('click', pause.paused)
                 lastTime = Date.now();
                 main();
+    }
+    function menuButtons(e) {
+        const target = event.target.className;
+            if (target === "Quick Game") {
+                playState();
             }
             if (target === "Resume") {
+                timer.timerCompensate();
                 modal.remove();
-                k = false;
-
+                pause.k = false;
                 lastTime = Date.now();
                 main();
             }
@@ -236,102 +227,38 @@ var Engine = (function(global) {
                 location.reload();
             }
             if (target === "Restart") {
-                k = false;
-                modal.remove();
-                player.reset();
-                allEnemies.forEach(function(enemy) {
-                    enemy.reset();
-                });
-                allEnemies = [];
-                for (let i = 0; i <= 2; i++) {
-                    allEnemies.push(new Enemy);
-                }
-                star.reset(true);
-                hearts.reset(true);
-                lastTime = Date.now();
-                main();
+                playState();
             }
             if (target === "Player Select") {
                 modal.remove();
-                q = 1;
                 playerSelect();
             }
             if (target === "Continue") {
-                player.continue = true;
-                b = false;
-                console.log(12);
-                menu.menusVar = [];
-                menu.menus = [];
-                modal.remove();
-                player.reset();
-                allEnemies.forEach(function(enemy) {
-                    enemy.reset();
-                });
-                allEnemies = [];
-                for (let i = 0; i <= 2; i++) {
-                    allEnemies.push(new Enemy);
-                }
-                star.reset(true);
-                hearts.reset(true);
-                lastTime = Date.now();
-                main();
+               player.continue = true;
+                playState();
             }
             if (target === "Submit") {
                 data.insert("random");
             }
             if (target === "Leaderboard") {
+                canvas.removeEventListener('click', pause.paused);
                 modal.remove();
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 leaderboards();
             }
-        });
-
-        // noop
     }
 
     function leaderboards() {
-        data.display();
-        win.requestAnimationFrame(leaderboards);
+        reset();
+        const modal = document.querySelector('.menu');
+        modal.style.background = "rgba(0, 0, 0, 0)";
+        data.update();
+        data.render();
     }
 
     function playerSelect() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            canvas.addEventListener('click', function(e) {
-            const pausedX = e.offsetX;
-            const pausedY = e.offsetY;
-        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 450) {
-            console.log(9001);
-            char1.check(true);
-            char2.check(true);
-            char3.check(true);
-            char4.check(true);
-            char5.check(true);
-        }
-
-        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 450) {
-            console.log(9001);
-            char1.check(false);
-            char2.check(false);
-            char3.check(false);
-            char4.check(false);
-            char5.check(false);
-        }
-
-        if (pausedX < 100 && pausedY < 50) {
-            if (q === 1) {
-                c = true;
-                q = 0;
-                console.log(7);
-            }
-        }
-
-        if (pausedX > 200 && pausedX < 300 && pausedY > 500 && pausedY < 550) {
-            console.log("works");
-            data.insert();
-            b = true;
-        }
-    });
-            input();
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        canvas.addEventListener('click', selectButtons.buttons);
         selectUpdate();
 }
 
@@ -397,8 +324,7 @@ var Engine = (function(global) {
             ctx.fillText("Back", 28, 35);
 
             const anim = win.requestAnimationFrame(selectUpdate);
-            if (b === true || c === true) {
-                const rem = document.querySelector('.inputDiv');
+            if (reusedVar.b === true || reusedVar.c === true) {
                 pauseSc(anim);
             }
 
@@ -408,32 +334,32 @@ var Engine = (function(global) {
         if (player.levels === 2) {
             win.cancelAnimationFrame(el);
             reset();
+            menu.menu("win");
         }
         if (hearts.hearts === 0) {
             win.cancelAnimationFrame(el);
             reset();
+            menu.menu("lost");
         }
-        if (k === true) {
+        if (pause.k === true) {
             win.cancelAnimationFrame(el);
             reset();
+            menu.menu("pause");
         }
-        if (b === true) {
+        if (reusedVar.b === true) {
             win.cancelAnimationFrame(el);
-            const rem = document.querySelector('.inputDiv');
-            rem.remove();
-            q = 0;
             ctx.clearRect(0,0,canvas.width,canvas.height)
             player.continue = true;
             reset();
+            reusedVar.b = false;
+            playState();
         }
-        if (c === true) {
+        if (reusedVar.c === true) {
             win.cancelAnimationFrame(el);
             ctx.clearRect(0,0,canvas.width,canvas.height)
-            const rem = document.querySelector('.inputDiv');
-            rem.remove();
             start = true;
-            c = false;
-            init();
+            reusedVar.c = false;
+            reset();
         }
     }
 

@@ -1,8 +1,5 @@
-// Enemies our player must avoid
 let allEnemies = [];
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+function Enemy() {
     this.gridX = [];
     this.gridY = [];
     for (i = 0; i <= 4; i++) {
@@ -16,22 +13,9 @@ var Enemy = function() {
     this.speed = Math.floor(Math.random() * (400 - 170) + 170);
     this.coordinatesX = - 101;
     this.coordinatesY = this.gridY[this.moveY];
-
-
-
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
     this.coordinatesX += (this.speed * dt);
 
     if (this.coordinatesX > 606) {
@@ -65,11 +49,9 @@ Enemy.prototype.update = function(dt) {
                 player.dificulty = 0;
             }
         }
-
     }
 };
 
-// Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.coordinatesX, this.coordinatesY);
 };
@@ -98,17 +80,7 @@ function checkCollisions() {
     });
 }
 
-for (let i = 0; i <= 2; i++) {
-    allEnemies.push(new Enemy);
-}
 
-
-
-let w = false;
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 function Player() {
     this.hit = false;
     this.gridX = [];
@@ -142,7 +114,6 @@ Player.prototype.render = function() {
     } else {
         ctx.drawImage(Resources.get(this.sprite[this.random]), this.gridX[this.moveX], this.gridY[this.moveY]);
     }
-
 };
 
 Player.prototype.update = function() {
@@ -153,9 +124,6 @@ Player.prototype.update = function() {
         hearts.hearts -= 1;
         player.handleInput("boom");
     }
-       if (this.levels === 4) {
-        w = true;
-        }
 };
 
 Player.prototype.handleInput = function(press) {
@@ -203,10 +171,12 @@ Player.prototype.handleInput = function(press) {
 };
 
 Player.prototype.reset = function() {
+    hearts.hearts = 3;
     this.moveY = 4;
     this.moveX = 2;
     this.dificulty = 0;
     this.levels = 0;
+    this.random = Math.floor(Math.random() * 4);
 };
 
 const player = new Player();
@@ -263,7 +233,7 @@ Collectibles.prototype.update = function() {
     if (this.type === "Star" && this.starSpawn === 1 && col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
         console.log("Star");
         this.colide = 0;
-        this.score += 1;
+        this.score += 10;
         this.coordinatesX, this.coordinatesY = -9001
     }
 };
@@ -277,15 +247,23 @@ Collectibles.prototype.reset = function(el) {
     this.colide = 1;
     if (el === true) {
         if (hearts.hearts === 3) {
-        this.heartSpawn = 0;
-        this.starSpawn = 1;
+        heart.heartSpawn = 0;
+        heart.starSpawn = 1;
+        star.heartSpawn = 0;
+        star.starSpawn = 1;
         } else if (hearts.hearts < 3 && heart.randomSpawn === 1) {
-        this.starSpawn = 0;
-        this.heartSpawn = 1;
+        heart.starSpawn = 0;
+        heart.heartSpawn = 1;
+        star.starSpawn = 0;
+        star.heartSpawn = 1;
         } else {
-            this.starSpawn = 1;
-            this.heartSpawn = 0;
+            heart.starSpawn = 1;
+            heart.heartSpawn = 0;
+            star.starSpawn = 1;
+            star.heartSpawn = 0;
         }
+    } else {
+        star.score = 0;
     }
 };
 
@@ -339,11 +317,9 @@ document.addEventListener('keyup', function(e) {
 }());
 
 
-let k = false;
-let b = false;
+//let k = false;
+//let b = false;
 function Tab(type, x, y, width, height) {
-    this.pausedX;
-    this.pausedY;
     this.sprite = 'images/Heart.png';
     this.hearts = 3;
     this.heartsX = 0;
@@ -352,8 +328,8 @@ function Tab(type, x, y, width, height) {
     this.width = width;
     this.height = height;
     this.type = type;
-
-
+    this.k = false;
+    this.count = 0;
 }
 
 Tab.prototype.render = function() {
@@ -370,19 +346,15 @@ Tab.prototype.render = function() {
         }
         this.heartsX = 0;
     }
+
+    if (this.type === "timer") {
+        ctx.font = "35px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.count, this.x, this.y);
+    }
 };
 
 Tab.prototype.update = function(el) {
-    if (this.type === "button") {
-        canvas.addEventListener('click', function(e) {
-        this.pausedX = e.offsetX;
-        this.pausedY = e.offsetY;
-            if (this.pausedX < 100 && this.pausedY < 50) {
-              k = true;
-              console.log(5);
-            }
-        });
-    }
     if (this.type === "hearts") {
             if (this.hearts < 0) {
                 this.hearts = 0;
@@ -391,14 +363,46 @@ Tab.prototype.update = function(el) {
                 this.hearts = 3;
             }
     }
+    if (this.type === "timer") {
+        this.count = timer.timerEnd();
+    }
 };
 
-Tab.prototype.reset = function() {
-    this.hearts = 3;
+Tab.prototype.paused = function(e) {
+        this.pausedX = e.offsetX;
+        this.pausedY = e.offsetY;
+            if (this.pausedX < 100 && this.pausedY < 50) {
+              pause.k = true;
+            }
+};
+
+Tab.prototype.timerStart = function() {
+    this.hours = new Date().getHours();
+    this.minutes = new Date().getMinutes();
+    this.seconds = new Date().getSeconds();
+    this.startPoint = (this.hours * 120) + (this.minutes * 60) + this.seconds;
+};
+
+Tab.prototype.timerEnd = function() {
+    this.h = new Date().getHours();
+    this.m = new Date().getMinutes();
+    this.s = new Date().getSeconds();
+    this.endPoint = (this.h * 120) + (this.m * 60) + this.s;
+    return this.endPoint - this.startPoint;
+};
+
+Tab.prototype.timerCompensate = function() {
+    this.ho = new Date().getHours();
+    this.mi = new Date().getMinutes();
+    this.se = new Date().getSeconds();
+    this.end = (this.h * 120) + (this.m * 60) + this.s;
+    this.compensate = this.endPoint - this.startPoint;
+    this.startPoint = this.startPoint + this.compensate;
 };
 
 const pause = new Tab("button", 0, 10, 100, 35);
 const hearts = new Tab("hearts", 400, 10, 30, 50);
+const timer = new Tab("timer", 300, 40, 100, 35)
 
 function Menus() {
         this.menus = [];
@@ -485,7 +489,6 @@ function Select(x, y, width, height, num) {
     this.mH;
     this.remXBy;
     this.count;
-
 }
 
 Select.prototype.render = function() {
@@ -568,43 +571,74 @@ Select.prototype.cycle = function(el) {
     }
 };
 
-const input = function() {
-    const body = document.querySelector('body');
-
-    const inputDiv = document.createElement('div');
-    inputDiv.classList.add('inputDiv');
-    body.appendChild(inputDiv);
-
-    const name = document.createElement('input');
-    name.classList.add('input');
-    name.placeholder = "Name";
-    name.value = "";
-    inputDiv.appendChild(name);
-    name.addEventListener('keydown', function(e) {
-        keyCode = e.keyCode;
-        if (e.keyCode == 13 || e.which == 13) {
-            submit(name.value);
+Select.prototype.buttons = function(e) {
+            const pausedX = e.offsetX;
+            const pausedY = e.offsetY;
+        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 450) {
+            console.log(9001);
+            char1.check(true);
+            char2.check(true);
+            char3.check(true);
+            char4.check(true);
+            char5.check(true);
         }
-    });
-};
-function submit(name) {
-    console.log(name);
-}
 
+        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 450) {
+            console.log(9001);
+            char1.check(false);
+            char2.check(false);
+            char3.check(false);
+            char4.check(false);
+            char5.check(false);
+        }
+
+        if (pausedX < 100 && pausedY < 50) {
+            reusedVar.c = true;
+            canvas.removeEventListener('click', selectButtons.buttons);
+            console.log(7);
+        }
+
+        if (pausedX > 200 && pausedX < 300 && pausedY > 500 && pausedY < 550) {
+            console.log("works");
+            data.insert("select");
+            reusedVar.b = true;
+            canvas.removeEventListener('click', selectButtons.buttons);
+        }
+};
+
+const reusedVar = {
+    b: false,
+    c: false,
+    star: true
+};
 
 const char1 = new Select(150, 25, 75, 150, 0);
 const char2 = new Select(50, 100, 100, 200, 1);
 const char3 = new Select(150, 100, 200, 350, 2);
 const char4 = new Select(350, 100, 100, 200, 3);
 const char5 = new Select(300, 25, 75, 150, 4);
+const selectButtons = new Select();
 
 function Data() {
     this.storage1 = "Recent_Character";
-    this.storage2 = "Player_Name";
+    this.name = "Name";
+    this.character = "Character";
+    this.score = "Score";
+    this.time = "Time";
+    this.star = "Stars";
+    this.heart = "Hearts";
     this.tag;
     this.tagArr = [char1, char2, char3, char4, char5];
     this.stringTag = ["char1", "char2", "char3", "char4", "char5"];
     this.timesPlayed = localStorage.TimesPlayed;
+    this.individualScore = [];
+    this.leaderboard = [];
+    this.scoreArr = [];
+    this.sY = 260;
+    this.bY = 275;
+    this.gY = 240;
+    this.namingArr = ["Name", "Score", "Time", "Stars", "Hearts"];
+    this.test = 2356;
 }
 
 Data.prototype.insert = function(el) {
@@ -616,8 +650,13 @@ Data.prototype.insert = function(el) {
             this.tag = this.tagArr[i].num;
         }
     }
-    if (el === "random") {
-        this.tag = player.random;
+        this.input = document.querySelector('input');
+
+    if (el === "select") {
+        localStorage.setItem(this.storage1, this.tag);
+        console.log(this.timesPlayed);
+        return;
+        console.log("test");
     }
     if (this.timesPlayed === undefined) {
         this.timesPlayed = 1;
@@ -626,26 +665,205 @@ Data.prototype.insert = function(el) {
         this.int += 1;
         this.timesPlayed = this.int;
     }
-    this.input = document.querySelector('input');
-    localStorage.setItem("TimesPlayed", this.timesPlayed)
-    localStorage.setItem(this.timesPlayed, this.stringTag);
-    localStorage.setItem(this.storage1, this.tag);
-    localStorage.setItem(this.storage2, this.input.value);
-    this.tag = parseInt(this.tag);
+
+    if (el === "random") {
+
+        this.name += this.timesPlayed;
+        this.character += this.timesPlayed;
+        this.score += this.timesPlayed;
+        this.time += this.timesPlayed;
+        this.star += this.timesPlayed;
+        this.heart += this.timesPlayed;
+        if (player.localSprite != undefined && player.continue === true) {
+            this.tag = parseInt(player.localSprite);
+        } else {
+            this.tag = player.random;
+        }
+        localStorage.setItem("TimesPlayed", this.timesPlayed)
+        localStorage.setItem(this.timesPlayed, this.stringTag);
+
+        localStorage.setItem(this.character, this.tag);
+        localStorage.setItem(this.name, this.input.value);
+        localStorage.setItem(this.score, star.score);
+        localStorage.setItem(this.time, 12);
+        localStorage.setItem(this.star, 2);
+        localStorage.setItem(this.heart, hearts.hearts);
+
+        console.log(this.timesPlayed);
+        this.name = "Name";
+        this.character = "Character";
+        this.score = "Score";
+        this.time = "Time";
+        this.star = "Stars";
+        this.heart = "Hearts";
+    }
 };
 
-Data.prototype.display = function() {
+Data.prototype.update = function() {
+    this.highest;
+    this.first = [];
+    this.second = [];
+    this.third = [];
+    this.index = []
+    this.list = [];
+    this.highestArr = [];
+    this.timesPlayed = parseInt(this.timesPlayed);
+
     if (this.timesPlayed > 0) {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        for (let i = 1; i <= this.timesPlayed; i++) {
+            this.n = this.name + i;
+            this.names = localStorage[this.n];
+            this.c = this.character + i;
+            this.characters = localStorage[this.c];
+            this.s = this.score + i;
+            this.scores = localStorage[this.s];
+            this.t = this.time + i;
+            this.times = localStorage[this.t];
+            this.st = this.star + i;
+            this.stars = localStorage[this.st];
+            this.h = this.heart + i;
+            this.hearts = localStorage[this.h];
+
+            this.leaderboard.push([this.characters, this.names, this.scores, this.times, this.stars, this.hearts]);
+        }
+        for (let i = 0; i < this.leaderboard.length; i++) {
+            this.scoreArr.push(parseInt(this.leaderboard[i][2]));
+            }
+            while (this.list.length < this.leaderboard.length) {
+                for (let i = 0; i < this.leaderboard.length; i++) {
+                    this.highest = Math.max(...this.scoreArr);
+                    this.highestArr.push(this.highest);
+                    this.index.push(this.scoreArr.indexOf(this.highest));
+                    this.scoreArr[this.index[i]] = -1;
+                    this.list.push(this.leaderboard[this.index[i]]);
+                }
+            }
+    }
+};
+
+Data.prototype.render = function() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle = "#A9BCF5";
         ctx.fillRect(0,50,canvas.width,canvas.height - 70);
-        this.chars = localStorage.Recent_Character;
-        this.names = localStorage.Player_Name;
-        ctx.drawImage(Resources.get(player.sprite[parseInt(this.chars)]), 170, 0, 150, 250);
+
+        const bod = document.querySelector('body');
+        const modal = document.createElement('div');
+        modal.classList.add('scoreListDiv');
+        bod.appendChild(modal);
+
+        const ulItems = document.createElement('ol');
+        ulItems.classList.add('ulCont');
+        ulItems.setAttribute("start", 4)
+        modal.appendChild(ulItems);
+
+        ctx.beginPath();
+        ctx.fillStyle = "#C0C0C0";
+        ctx.fillRect(0, 240, canvas.width / 3, 70);
+        ctx.beginPath();
+        ctx.moveTo(1, 240);
+        ctx.lineTo(10, 190);
+        ctx.lineTo(canvas.width / 3 + 5, 190);
+        ctx.lineTo(canvas.width / 3, 240);
+        ctx.lineTo(1, 240);
+        ctx.lineTo(1, 340);
+        ctx.lineTo(canvas.width / 3, 340);
+        ctx.lineTo(canvas.width / 3, 240);
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "15px Arial";
+        ctx.fillStyle = "black";
+        for (let i = 0; i < this.namingArr.length; i++) {
+            ctx.fillText(this.namingArr[i], 15, this.sY);
+            this.sY += 15;
+        }
+
+
+
+        ctx.beginPath();
+        ctx.fillStyle = "#cd6532";
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 3 * 2, 260);
+        ctx.lineTo(canvas.width / 3 * 2 - 5, 210);
+        ctx.lineTo(canvas.width / 3 * 3 - 5, 210);
+        ctx.lineTo(canvas.width / 3 * 3, 260);
+        ctx.lineTo(canvas.width / 3 * 2, 260);
+        ctx.lineTo(canvas.width / 3 * 2, 340);
+        ctx.lineTo(canvas.width / 3 * 3, 340);
+        ctx.lineTo(canvas.width / 3 * 3, 260);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.font = "15px Arial";
+        for (let i = 0; i < this.namingArr.length; i++) {
+            ctx.fillText(this.namingArr[i], 350, this.bY);
+            this.bY += 15;
+        }
+
+        ctx.beginPath();
+        ctx.fillStyle = "#FFD700";
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 3, 220);
+        ctx.lineTo(canvas.width / 3 + 5, 170);
+        ctx.lineTo(canvas.width / 3 * 2 - 5, 170);
+        ctx.lineTo(canvas.width / 3 * 2, 220);
+        ctx.lineTo(canvas.width / 3, 220);
+        ctx.lineTo(canvas.width / 3, 340);
+        ctx.lineTo(canvas.width / 3 * 2, 340);
+        ctx.lineTo(canvas.width / 3 * 2, 220);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.font = "15px Arial";
+        for (let i = 0; i < this.namingArr.length; i++) {
+            ctx.fillText(this.namingArr[i], 180, this.gY);
+            this.gY += 15;
+        }
+
+
+    for (let i = 0; i < this.list.length; i++) {
+        if (this.first[0] === undefined) {
+            this.first.push(this.list[i]);
+            console.log(this.first);
+            ctx.drawImage(Resources.get(player.sprite[parseInt(this.first[0][0])]), 180, 0, 150, 250);
+            ctx.fillStyle = "black";
+            this.gY = 240;
+
+            for (let i = 1; i <= this.namingArr.length; i++) {
+            ctx.fillText(this.first[0][i], 240, this.gY);
+            this.gY += 15;
+            }
+        } else if (this.second[0] === undefined) {
+            this.second.push(this.list[i]);
+            console.log(this.second);
+            ctx.drawImage(Resources.get(player.sprite[parseInt(this.second[0][0])]), 10, 20, 150, 250);
+            this.sY = 260;
+
+            for (let i = 1; i <= this.namingArr.length; i++) {
+            ctx.fillText(this.second[0][i], 75, this.sY);
+            this.sY += 15;
+            }
+        } else if (this.third[0] === undefined) {
+            this.third.push(this.list[i]);
+            console.log(this.third);
+            ctx.drawImage(Resources.get(player.sprite[parseInt(this.third[0][0])]), 350, 40, 150, 250);
+            this.bY = 275;
+
+            for (let i = 1; i <= this.namingArr.length; i++) {
+            ctx.fillText(this.second[0][i], 410, this.bY);
+            this.bY += 15;
+            }
+        } else {
+                const listItems = document.createElement('li');
+                listItems.classList.add('listItems');
+                listItems.innerHTML = this.list[i][1] + "_" + this.list[i][2] + "_" +
+                this.list[i][3] + "_" + this.list[i][4] + "_" + this.list[i][5];
+                ulItems.appendChild(listItems);
+
+                console.log(this.list[i]);
+        }
     }
-
 };
-
 
 const data = new Data();
 
