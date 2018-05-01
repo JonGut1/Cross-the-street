@@ -10,6 +10,10 @@ body {
 	display: none;
 }
 
+.scoreShow {
+	color: white;
+}
+
 .inputDiv {
 	position: fixed;
 	z-index: 1;
@@ -21,10 +25,11 @@ body {
 .scoreListDiv {
 	position: fixed;
 	z-index: 1;
-	width: 505px;
-	height: 240px;
-	margin-top: 340px;
-	padding: 10px;
+	border: 1px solid black;
+	width: 490px;
+	height: 220px;
+	margin-top: 350px;
+	background-color: #629FA7;
 }
 
 .listItems {
@@ -32,14 +37,35 @@ body {
 	height: 20px;
 }
 
-.ulCont {
-	padding: 10px;
-	padding-left: 30px;
-	border: 1px solid black;
+.liItems {
+	box-sizing: border-box;
+	width: 80px;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	display: inline-block;
+}
+
+.namingLi {
+	list-style: none;
+	display: inline-block;
+	width: 80px;
+	border-right: 1px solid black;
+	padding-left: 0px;
+}
+
+.namingUl {
 	width: 100%;
-	height: 100%;
+	height: 10%;
+	font-size: 16px;
+	margin-bottom: 0px;
+}
+
+.ulCont {
+	width: 100%;
+	height: 90%;
 	overflow: auto;
 	font-size: 16px;
+	margin-bottom: 0px;
 
 }
 
@@ -115,11 +141,11 @@ body {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		justify-content: flex-end;
+		justify-content: center;
 		position: fixed;
 		z-index: 1;
 		width: 100%;
-		height: 180px;
+		height: 200px;
 		margin-top: 60vh;
 	}
 
@@ -134,23 +160,103 @@ body {
 
 	.ud {
 		height: 100%;
-		width: 10%;
+		width: 100px;
+		margin: 5px;
+	}
+
+	.up, .down, .left, .right {
+		width: 100%;
+		height: 40%;
+		margin: 5px;
+		border: 1px solid silver;
+		border-radius: 10px;
+		font-size: 30px;
+		opacity: 0.5;
+		transition: 0.3s;
+	}
+	.anim {
+		background-color: #E8F6FF;
+		opacity: 0.8;
+	}
+
+	.up, .down {
+		padding: 0px;
+		margin: 0px;
+	}
+	.up {
+		margin-bottom: 10px;
+	}
+	.left, .right {
+		width: 15%;
+	}
+}
+
+@media screen and (max-width: 450px) {
+	.menu {
+		margin-top: 1%;
+		width: 100%;
+		height: 115vw;
+	}
+	canvas {
+		width: 100%;
+		height: 120vw;
+	}
+	.buttonCont {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		position: fixed;
+		z-index: 1;
+		width: 100%;
+		height: 100px;
+		margin-top: 80vh;
+	}
+	.ud {
+		height: 100%;
+		width: 100px;
 	}
 
 	.up, .down, .left, .right {
 		width: 100%;
 		height: 40%;
 		border: 1px solid silver;
-		border-radius: 70px;
+		border-radius: 10px;
 		font-size: 30px;
+		opacity: 0.5;
+		transition: 0.3s;
 	}
 
-	.left, .right {
-		width: 10%;
+	.anim {
+		background-color: #E8F6FF;
+		opacity: 0.8;
 	}
 
+	.up, .down {
+		padding: 0px;
+		margin: 0px;
+		height: 50px;
+	}
 	.up {
-		margin-bottom: 10%;
+		margin-bottom: 2px;
+	}
+	.left, .right {
+		width: 80px;
+		height: 90px;
+	}
+
+	.scoreListDiv {
+		margin-top: 68vw;
+		height: 48vw;
+		width: 100vw;
+	}
+
+	.liItems {
+		width: 18%;
+	}
+
+	.namingLi {
+		width: 18%;
 	}
 }
 
