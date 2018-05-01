@@ -12,7 +12,6 @@
  * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
-let start = true;
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -183,9 +182,9 @@ var Engine = (function(global) {
         global.modal = modal;
         render();
         modal.addEventListener('click', menuButtons);
-        if (start === true) {
+        if (reusedVar.start === true) {
             menu.menu("menu");
-            start = false;
+        reusedVar.start = false;
             console.log(1);
         }
     }
@@ -213,7 +212,7 @@ var Engine = (function(global) {
                 main();
     }
     function menuButtons(e) {
-        const target = event.target.className;
+        const target = e.target.className;
             if (target === "Quick Game") {
                 playState();
             }
@@ -240,6 +239,10 @@ var Engine = (function(global) {
             }
             if (target === "Submit") {
                 data.insert("random");
+                console.log(target);
+                e.target.style.background = "grey";
+                e.target.style.opacity = "0.3";
+                e.target.setAttribute('disabled', "");
             }
             if (target === "Leaderboard") {
                 canvas.removeEventListener('click', pause.paused);
@@ -251,14 +254,24 @@ var Engine = (function(global) {
 
     function leaderboards() {
         reset();
-        const modal = document.querySelector('.menu');
-        modal.style.background = "rgba(0, 0, 0, 0)";
+        document.querySelector('.menu').remove();
         data.update();
         data.render();
+        ctx.fillStyle = "black";
+        ctx.strokeRect(0, 10, 100, 35);
+        ctx.font = '20px serif';
+        ctx.fillText("Back", 28, 35);
+        canvas.addEventListener('click', selectButtons.back);
     }
 
     function playerSelect() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
+        const body = document.querySelector('body');
+        const input = document.createElement('input');
+        input.classList.add('selectInput');
+        input.innerHTML = "";
+        input.placeholder = "Name";
+        body.appendChild(input);
         canvas.addEventListener('click', selectButtons.buttons);
         selectUpdate();
 }
@@ -268,7 +281,7 @@ var Engine = (function(global) {
             ctx.fillStyle = "#A9BCF5";
             ctx.fillRect(0,50,canvas.width,canvas.height - 70);
 
-
+            ctx.strokeStyle = "black";
             ctx.fillStyle = "#F5D0A9";
             ctx.beginPath();
             ctx.ellipse(250, 450, 40, 70, 90 * Math.PI/180, 0, 2 * Math.PI);
@@ -298,15 +311,40 @@ var Engine = (function(global) {
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = "green";
-            ctx.fillRect(350, 400, 100, 50);
-            ctx.fillRect(50, 400, 100, 50);
-            ctx.fillRect(200, 500, 100, 50);
-            ctx.font = '20px serif';
-            ctx.fillStyle = "white";
-            ctx.fillText("NEXT", 373, 430);
-            ctx.fillText("PREV", 73, 430);
-            ctx.fillText("SUBMIT", 212, 530);
+                ctx.fillStyle = "#FA5858";
+                ctx.strokeStyle = "white";
+                ctx.beginPath();
+                ctx.moveTo(50, 400);
+                ctx.lineTo(120, 350);
+                ctx.lineTo(120, 380);
+                ctx.lineTo(150, 380);
+                ctx.lineTo(150, 420);
+                ctx.lineTo(120, 420);
+                ctx.lineTo(120, 450);
+                ctx.lineTo(50, 400);
+                ctx.fill();
+                ctx.stroke();
+
+
+                ctx.beginPath();
+                ctx.moveTo(455, 400);
+                ctx.lineTo(385, 350);
+                ctx.lineTo(385, 380);
+                ctx.lineTo(355, 380);
+                ctx.lineTo(355, 420);
+                ctx.lineTo(385, 420);
+                ctx.lineTo(385, 450);
+                ctx.lineTo(455, 400);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillRect(200, 500, 100, 50);
+                ctx.fillStyle = "black";
+                ctx.font = "20px Arial"
+                ctx.fillText("Select", 223, 532)
+                ctx.strokeRect(200, 500, 100, 50);
+                ctx.strokeStyle = "black";
+
 
             char1.render();
             char1.update();
@@ -358,7 +396,7 @@ var Engine = (function(global) {
         if (reusedVar.c === true) {
             win.cancelAnimationFrame(el);
             ctx.clearRect(0,0,canvas.width,canvas.height)
-            start = true;
+        reusedVar.start = true;
             reusedVar.c = false;
             reset();
         }
@@ -393,5 +431,6 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
     global.canvas = canvas;
+    global.reset = reset;
 
 })(this);

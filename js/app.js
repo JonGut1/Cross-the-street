@@ -77,7 +77,7 @@ function checkCollisions() {
         let x = el.coordinatesX - player.coordinatesX;
         let y = el.coordinatesY - player.coordinatesY;
         let center = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        if (center < 50) {
+        if (center < 60) {
             player.hit = true;
             console.log(center);
         }
@@ -128,6 +128,17 @@ Player.prototype.update = function() {
         this.moveX = 2;
         hearts.hearts -= 1;
         player.handleInput("boom");
+    }
+    if (player.levels === 5) {
+        player.score *= 2;
+            player.score += hearts.hearts * 20;
+            player.score -= timer.count;
+            if (star.starsCollected > 10) {
+                player.score += 100;
+            }
+            if (player.score < 1) {
+                player.score = 0;
+            }
     }
 };
 
@@ -315,7 +326,7 @@ document.addEventListener('keyup', function(e) {
         upBu.className += ' anim';
         setTimeout(function() {
             upBu.className = 'up';
-        }, 500);
+        }, 100);
 
         }
         if (event.target.className === 'down' || event.target.className === 'glyphicon glyphicon-arrow-down') {
@@ -324,7 +335,7 @@ document.addEventListener('keyup', function(e) {
         downBu.className += ' anim';
         setTimeout(function() {
             downBu.className = 'down';
-        }, 500);
+        }, 100);
 
         }
         if (event.target.className === 'left' || event.target.className === 'glyphicon glyphicon-arrow-left') {
@@ -333,7 +344,7 @@ document.addEventListener('keyup', function(e) {
         leftBu.className += ' anim';
         setTimeout(function() {
             leftBu.className = 'left';
-        }, 500);
+        }, 100);
 
         }
         if (event.target.className === 'right' || event.target.className === 'glyphicon glyphicon-arrow-right') {
@@ -342,7 +353,7 @@ document.addEventListener('keyup', function(e) {
         rightBu.className += ' anim';
         setTimeout(function() {
             rightBu.className = 'right';
-        }, 500);
+        }, 100);
         }
 
 
@@ -463,6 +474,11 @@ Menus.prototype.inputField = function(el) {
     }
     const input = document.createElement('input');
     input.classList.add('nameInput');
+    if (localStorage[data.storage2] != undefined && player.continue === true){
+        input.setAttribute('value', localStorage[data.storage2]);
+    } else {
+        input.placeholder = "Name";
+    }
     inputDiv.appendChild(input);
 };
 
@@ -477,22 +493,14 @@ Menus.prototype.menu = function(el) {
             this.menus = ["Resume", "Restart", "Quit"];
         }
         if (el === "win") {
+            reusedVar.d = true;
             this.menus = ["Submit", "Restart", "Leaderboard", "Quit"];
             this.inputField("win");
-            player.score *= 2;
-            player.score += hearts.hearts * 20;
-            player.score -= timer.count;
-            if (star.starsCollected > 10) {
-                player.score += 100;
-            }
-            if (player.score < 1) {
-                player.score = 0;
-            }
             const scoreShow = document.createElement('span');
             scoreShow.classList.add('scoreShow');
             scoreShow.innerHTML = `Your score is ${player.score}.`;
             this.menuDiv.prepend(scoreShow);
-            this.menuDiv.style.padding = "5%";
+            this.menuDiv.style.padding = "10px";
         }
         if (el === "lost") {
             this.menus = ["Restart", "Leaderboard", "Quit"];
@@ -617,44 +625,93 @@ Select.prototype.cycle = function(el) {
 };
 
 Select.prototype.buttons = function(e) {
+    this.canWidL = canvas.offsetWidth / 10;
+    this.canHigLR = canvas.offsetHeight / 1.5;
+    this.canWidR = canvas.offsetWidth / 1.109;
+    this.canWidM = canvas.offsetWidth / 2.52;
+    this.canHigM = canvas.offsetHeight / 1.21;
+    this.size = [100, 90, 100, 50];
             const pausedX = e.offsetX;
             const pausedY = e.offsetY;
-        if (pausedX > 350 && pausedY > 400 && pausedX < 450 && pausedY < 450) {
-            console.log(9001);
-            char1.check(true);
-            char2.check(true);
-            char3.check(true);
-            char4.check(true);
-            char5.check(true);
-        }
+            if (canvas.offsetWidth < 400) {
+                this.size = [80, 80, 70, 40];
+            }
+                if (pausedX < this.canWidR && pausedY > this.canHigLR - 50 && pausedX > this.canWidR - this.size[0] && pausedY < this.canHigLR + 50) {
+                    console.log(9001);
+                    char1.check(true);
+                    char2.check(true);
+                    char3.check(true);
+                    char4.check(true);
+                    char5.check(true);
+                 }
 
-        if (pausedX > 50 && pausedY > 400 && pausedX < 150 && pausedY < 450) {
-            console.log(9001);
-            char1.check(false);
-            char2.check(false);
-            char3.check(false);
-            char4.check(false);
-            char5.check(false);
-        }
+                if (pausedX > this.canWidL && pausedY > this.canHigLR - 50 && pausedX < this.canWidL + this.size[1] && pausedY < this.canHigLR + 50) {
+                    console.log(9001);
+                    char1.check(false);
+                    char2.check(false);
+                    char3.check(false);
+                    char4.check(false);
+                    char5.check(false);
+                }
+                if (pausedX > this.canWidM && pausedX < this.canWidM + this.size[2] && pausedY > this.canHigM && pausedY < this.canHigM + this.size[3]) {
+                    console.log("works");
+                    data.insert("select");
+                    document.querySelector('.selectInput').remove();
+                    reusedVar.b = true;
+                    canvas.removeEventListener('click', selectButtons.buttons);
+                }
 
-        if (pausedX < 100 && pausedY < 50) {
+
+
+        if (pausedX < this.size[0] && pausedY < this.size[3]) {
             reusedVar.c = true;
+            document.querySelector('.selectInput').remove();
+            start = false;
             canvas.removeEventListener('click', selectButtons.buttons);
             console.log(7);
         }
 
-        if (pausedX > 200 && pausedX < 300 && pausedY > 500 && pausedY < 550) {
-            console.log("works");
-            data.insert("select");
-            reusedVar.b = true;
-            canvas.removeEventListener('click', selectButtons.buttons);
+
+};
+
+Select.prototype.back = function(e) {
+
+    const pausedX = e.offsetX;
+            const pausedY = e.offsetY;
+            if (canvas.offsetWidth < 400) {
+                this.size = [80, 80, 70, 40];
+            }
+    if (pausedX < this.size[0] && pausedY < this.size[3]) {
+        data.leaderboard = [];
+    data.scoreArr = [];
+    data.sY = 260;
+    data.bY = 275;
+    data.gY = 240;
+    canvas.removeEventListener('click', selectButtons.back);
+            document.querySelector('.scoreListDiv').remove();
+        if (reusedVar.d === true) {
+        reusedVar.d = false;
+        reusedVar.start = false;
+        reset();
+        menu.menu("win");
+        const submit = document.querySelector('.Submit');
+        submit.style.background = "grey";
+        submit.style.opacity = "0.3";
+        submit.setAttribute('disabled', "");
+    } else {
+        reusedVar.start = true;
+        reset();
+    }
+
+
         }
 };
 
 const reusedVar = {
     b: false,
     c: false,
-    star: true
+    d: false,
+    start: true
 };
 
 const char1 = new Select(150, 25, 75, 150, 0);
@@ -666,6 +723,7 @@ const selectButtons = new Select();
 
 function Data() {
     this.storage1 = "Recent_Character";
+    this.storage2 = "Recent_Name";
     this.name = "Name";
     this.character = "Character";
     this.score = "Score";
@@ -683,7 +741,6 @@ function Data() {
     this.bY = 275;
     this.gY = 240;
     this.namingArr = ["Name", "Score", "Time", "Stars", "Hearts"];
-    this.test = 2356;
 }
 
 Data.prototype.insert = function(el) {
@@ -698,7 +755,9 @@ Data.prototype.insert = function(el) {
         this.input = document.querySelector('input');
 
     if (el === "select") {
+        this.value = document.querySelector('.selectInput').value;
         localStorage.setItem(this.storage1, this.tag);
+        localStorage.setItem(this.storage2, this.value);
         console.log(this.timesPlayed);
         return;
         console.log("test");
