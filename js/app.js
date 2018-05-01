@@ -22,11 +22,15 @@ Enemy.prototype.update = function(dt) {
         this.coordinatesX = -101;
         this.moveY = Math.floor(Math.random() * 3);
         this.coordinatesY = this.gridY[this.moveY];
-        if (this.speed > 500) {
+        if (player.levels > 10) {
+            if (this.speed > 500) {
             this.speed = Math.floor(Math.random() * (600 - 501) + 501);
-        } else if (this.speed > 400) {
+            } else if (this.speed > 400) {
             this.speed = Math.floor(Math.random() * (500 - 401) + 401);
-        } else if (this.speed >= 350) {
+            }
+        }
+
+        if (this.speed >= 350) {
             this.speed = Math.floor(Math.random() * (400 - 300) + 300);
         } else if (this.speed < 300 && this.speed >= 250) {
             this.speed = Math.floor(Math.random() * (299 - 200) + 200);
@@ -104,6 +108,7 @@ function Player() {
     this.dificulty = 0;
     this.levels = 0;
     this.continue = false;
+    this.score = 0;
 };
 
 
@@ -133,12 +138,13 @@ Player.prototype.handleInput = function(press) {
             this.levels += 1;
             this.moveY = 5;
             this.moveX = 2;
-            heart.randomSpawn = Math.floor(Math.random() * 4);
+            heart.randomSpawn = Math.floor(Math.random() * 2);
             star.reset(true);
             heart.reset(true);
         }
         console.log('up');
         this.moveY -= 1;
+
     }
     if (press === "down") {
         if (this.moveY === 4) {
@@ -146,6 +152,7 @@ Player.prototype.handleInput = function(press) {
         }
         console.log('down');
         this.moveY += 1;
+
     }
     if (press === "left") {
         if (this.moveX === 0) {
@@ -154,6 +161,7 @@ Player.prototype.handleInput = function(press) {
         console.log('left');
         this.moveX -= 1;
         this.posX = this.gridX[this.moveX];
+
     }
     if (press === "right") {
         if (this.moveX === 4) {
@@ -162,6 +170,7 @@ Player.prototype.handleInput = function(press) {
         console.log('right');
         this.moveX += 1;
         this.posX = this.gridX[this.moveX];
+
     }
     if (press === "boom") {
         console.log("boom");
@@ -177,6 +186,7 @@ Player.prototype.reset = function() {
     this.dificulty = 0;
     this.levels = 0;
     this.random = Math.floor(Math.random() * 4);
+    this.score = 0;
 };
 
 const player = new Player();
@@ -209,8 +219,7 @@ function Collectibles(type) {
     this.starSpawn = 0;
     this.keySpawn = 1;
     this.amount;
-    this.score = 0;
-
+    this.starsCollected = 0;
     this.starArr = [];
 };
 
@@ -233,7 +242,8 @@ Collectibles.prototype.update = function() {
     if (this.type === "Star" && this.starSpawn === 1 && col(player.coordinatesX, player.coordinatesY, this.coordinatesX, this.coordinatesY) < 50) {
         console.log("Star");
         this.colide = 0;
-        this.score += 10;
+        player.score += 30;
+        this.starsCollected +=1;
         this.coordinatesX, this.coordinatesY = -9001
     }
 };
@@ -264,9 +274,9 @@ Collectibles.prototype.reset = function(el) {
         }
     } else {
         star.score = 0;
+        this.starsCollected = 0;
     }
 };
-
 
 const star = new Collectibles('Star');
 const heart = new Collectibles('Heart');
@@ -295,20 +305,44 @@ document.addEventListener('keyup', function(e) {
 });
 
 (function mobileButtons() {
-    const buttons = document.querySelector('.buttonCont');
+    const buttons = document.querySelector('.buttonCont')
+    buttons.style.visibility = "hidden";
     buttons.addEventListener('click', function(event) {
 
         if (event.target.className === 'up' || event.target.className === 'glyphicon glyphicon-arrow-up') {
             player.handleInput(allowedKeys[38]);
+            const upBu = document.querySelector('.up')
+        upBu.className += ' anim';
+        setTimeout(function() {
+            upBu.className = 'up';
+        }, 500);
+
         }
         if (event.target.className === 'down' || event.target.className === 'glyphicon glyphicon-arrow-down') {
             player.handleInput(allowedKeys[40]);
+            const downBu = document.querySelector('.down');
+        downBu.className += ' anim';
+        setTimeout(function() {
+            downBu.className = 'down';
+        }, 500);
+
         }
         if (event.target.className === 'left' || event.target.className === 'glyphicon glyphicon-arrow-left') {
             player.handleInput(allowedKeys[37]);
+            const leftBu = document.querySelector('.left');
+        leftBu.className += ' anim';
+        setTimeout(function() {
+            leftBu.className = 'left';
+        }, 500);
+
         }
         if (event.target.className === 'right' || event.target.className === 'glyphicon glyphicon-arrow-right') {
             player.handleInput(allowedKeys[39]);
+            const rightBu = document.querySelector('.right');
+        rightBu.className += ' anim';
+        setTimeout(function() {
+            rightBu.className = 'right';
+        }, 500);
         }
 
 
@@ -364,7 +398,7 @@ Tab.prototype.update = function(el) {
             }
     }
     if (this.type === "timer") {
-        this.count = timer.timerEnd();
+        this.count = Math.floor(timer.timerEnd());
     }
 };
 
@@ -411,10 +445,10 @@ Menus.prototype.inputField = function(el) {
         this.text = "You lost, try again!!!!";
         this.class = 'textLose';
     }
-    const menu = document.querySelector('.menu');
+    this.menuDiv = document.querySelector('.menu');
     const inputDiv = document.createElement('div');
     inputDiv.classList.add('nameDiv');
-    menu.appendChild(inputDiv);
+    this.menuDiv.appendChild(inputDiv);
 
     const textDiv = document.createElement('div');
     textDiv.classList.add('textDiv');
@@ -438,12 +472,29 @@ Menus.prototype.menu = function(el) {
             if (player.localSprite != undefined) {
                 this.menus.unshift("Continue");
             }
-        } else if (el === "pause") {
+        }
+        if (el === "pause") {
             this.menus = ["Resume", "Restart", "Quit"];
-        } else if (el === "win") {
+        }
+        if (el === "win") {
             this.menus = ["Submit", "Restart", "Leaderboard", "Quit"];
             this.inputField("win");
-        } else if (el === "lost") {
+            player.score *= 2;
+            player.score += hearts.hearts * 20;
+            player.score -= timer.count;
+            if (star.starsCollected > 10) {
+                player.score += 100;
+            }
+            if (player.score < 1) {
+                player.score = 0;
+            }
+            const scoreShow = document.createElement('span');
+            scoreShow.classList.add('scoreShow');
+            scoreShow.innerHTML = `Your score is ${player.score}.`;
+            this.menuDiv.prepend(scoreShow);
+            this.menuDiv.style.padding = "5%";
+        }
+        if (el === "lost") {
             this.menus = ["Restart", "Leaderboard", "Quit"];
             this.inputField("lost");
         }
@@ -678,9 +729,9 @@ Data.prototype.insert = function(el) {
 
         localStorage.setItem(this.character, this.tag);
         localStorage.setItem(this.name, this.input.value);
-        localStorage.setItem(this.score, star.score);
-        localStorage.setItem(this.time, 12);
-        localStorage.setItem(this.star, 2);
+        localStorage.setItem(this.score, player.score);
+        localStorage.setItem(this.time, timer.count);
+        localStorage.setItem(this.star, star.starsCollected);
         localStorage.setItem(this.heart, hearts.hearts);
 
         console.log(this.timesPlayed);
@@ -746,10 +797,23 @@ Data.prototype.render = function() {
         modal.classList.add('scoreListDiv');
         bod.appendChild(modal);
 
+        const namingUl = document.createElement('ul');
+        namingUl.classList.add('namingUl');
+        modal.appendChild(namingUl);
+
+        for (let i = 0; i < 5; i++) {
+            const namingLi = document.createElement('li');
+            namingLi.classList.add('namingLi');
+            namingLi.innerHTML = this.namingArr[i];
+            namingUl.appendChild(namingLi);
+        }
+
         const ulItems = document.createElement('ol');
         ulItems.classList.add('ulCont');
         ulItems.setAttribute("start", 4)
         modal.appendChild(ulItems);
+
+
 
         ctx.beginPath();
         ctx.fillStyle = "#C0C0C0";
@@ -844,15 +908,21 @@ Data.prototype.render = function() {
             this.bY = 275;
 
             for (let i = 1; i <= this.namingArr.length; i++) {
-            ctx.fillText(this.second[0][i], 410, this.bY);
+            ctx.fillText(this.third[0][i], 410, this.bY);
             this.bY += 15;
             }
         } else {
                 const listItems = document.createElement('li');
                 listItems.classList.add('listItems');
-                listItems.innerHTML = this.list[i][1] + "_" + this.list[i][2] + "_" +
-                this.list[i][3] + "_" + this.list[i][4] + "_" + this.list[i][5];
                 ulItems.appendChild(listItems);
+
+                for (let p = 1; p < 6; p++) {
+                    const liItems = document.createElement('span');
+                    liItems.classList.add('liItems');
+                    liItems.innerHTML = this.list[i][p];
+                    listItems.appendChild(liItems)
+                }
+
 
                 console.log(this.list[i]);
         }

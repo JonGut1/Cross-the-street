@@ -190,6 +190,7 @@ var Engine = (function(global) {
         }
     }
     function playState() {
+                document.querySelector('.buttonCont').style.visibility = "visible";
                 console.log(12);
                 pause.k = false;
                 menu.menusVar = [];
@@ -331,7 +332,7 @@ var Engine = (function(global) {
     }
 
     function pauseSc(el) {
-        if (player.levels === 2) {
+        if (player.levels === 5) {
             win.cancelAnimationFrame(el);
             reset();
             menu.menu("win");
