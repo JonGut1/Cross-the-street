@@ -675,7 +675,7 @@ Select.prototype.buttons = function(e) {
 };
 
 Select.prototype.back = function(e) {
-
+    this.size = [100, 90, 100, 50];
     const pausedX = e.offsetX;
             const pausedY = e.offsetY;
             if (canvas.offsetWidth < 400) {
