@@ -938,7 +938,11 @@ function Data() {
     this.tag;
     this.tagArr = [char1, char2, char3, char4, char5];
     this.stringTag = ["char1", "char2", "char3", "char4", "char5"];
-    this.timesPlayed = localStorage.TimesPlayed;
+    if (localStorage.TimesPlayed === undefined) {
+        this.timesPlayed = 0;
+    } else {
+        this.timesPlayed = localStorage.TimesPlayed;
+    }
     this.individualScore = [];
     this.leaderboard = [];
     this.scoreArr = [];
@@ -1000,7 +1004,7 @@ Data.prototype.insert = function(el) {
         * if the player select tag is present in the localStorage, then
         * that tag will be used to add together with other scores.
         */
-        if (player.localSprite != undefined && player.continue === true) {
+        if (player.localSprite != undefined || player.localSprite != null || player.localSprite != NaN && player.continue === true) {
             this.tag = parseInt(player.localSprite);
         } else {
             this.tag = player.random;
