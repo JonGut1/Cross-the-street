@@ -934,6 +934,7 @@ function Data() {
     this.time = "Time";
     this.star = "Stars";
     this.heart = "Hearts";
+    this.taged = ""
     this.tag;
     this.tagArr = [char1, char2, char3, char4, char5];
     this.stringTag = ["char1", "char2", "char3", "char4", "char5"];
@@ -976,7 +977,7 @@ Data.prototype.insert = function(el) {
         localStorage.setItem(this.storage2, this.value);
         return;
     }
-    if (this.timesPlayed === undefined) {
+    if (this.timesPlayed === undefined || this.timesPlayed === NaN || this.timesPlayed === null) {
         this.timesPlayed = 1;
     } else {
         this.int = parseInt(this.timesPlayed);
@@ -1004,7 +1005,7 @@ Data.prototype.insert = function(el) {
         } else {
             this.tag = player.random;
         }
-        localStorage.setItem("TimesPlayed", this.timesPlayed)
+        localStorage.setItem("TimesPlayed", this.timesPlayed);
         localStorage.setItem(this.timesPlayed, this.stringTag);
 
         localStorage.setItem(this.character, this.tag);
