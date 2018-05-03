@@ -36,6 +36,8 @@ HTML5 was used to add the primary elements into the DOM.
 
 Some of the formulas used for the collision code were taken from http://strd6.com/2010/06/circular-collision-detection-in-javascript/.
 
+The engine.js and resources.js were provided by the FEND Udacity course. The engine.js contained only the game loop. The resources.js contained everything that it contains right now. In the app.js only the outline of the enemy class whith some basic code and a player class with even less code was provided. Also the arrow keys event listener and playerHandleInput was provided by the FEND course.
+
 ## Dependencies
 
 Styles,
