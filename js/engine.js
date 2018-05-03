@@ -26,7 +26,6 @@ var Engine = (function(global) {
     canvas.width = 505;
     canvas.height = 606;
     doc.body.appendChild(canvas);
-
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -39,26 +38,23 @@ var Engine = (function(global) {
          */
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
-
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-
         update(dt);
         render();
-
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
         lastTime = now;
-
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
         let anim = win.requestAnimationFrame(main);
+        /*checks whether certain conditions are met.
+        */
         pauseSc(anim);
     }
-
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
      * game loop.
@@ -67,7 +63,6 @@ var Engine = (function(global) {
         reset();
 
     }
-
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
      * you implement your collision detection (when two entities occupy the
@@ -81,7 +76,6 @@ var Engine = (function(global) {
         updateEntities(dt);
         checkCollisions();
     }
-
     /* This is called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
      * their update() methods. It will then call the update function for your
@@ -93,15 +87,12 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-
         player.update();
         star.update();
-        key.update();
         heart.update();
         hearts.update();
         timer.update();
     }
-
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -112,7 +103,6 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
-
         var rowImages = [
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
@@ -124,7 +114,6 @@ var Engine = (function(global) {
             numRows = 6,
             numCols = 5,
             row, col;
-
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height)
 
@@ -146,7 +135,6 @@ var Engine = (function(global) {
         }
         renderEntities();
     }
-
     /* This function is called by the render function and is called on each game
      * tick. Its purpose is to then call the render functions you have defined
      * on your enemy and player entities within app.js
@@ -160,18 +148,15 @@ var Engine = (function(global) {
         });
         heart.render();
         star.render();
-        key.render();
         player.render();
         hearts.render();
         pause.render();
         timer.render();
-
     }
-
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
+    /* It is called when the app starts and creates a modal and calls
+    * the render() function which renders all of the visuals of the game.
+    * an if statement checks whether to open up the main menu or not.
+    */
     function reset() {
         const body = document.querySelector('body');
         const modal = document.createElement('modal');
@@ -181,38 +166,19 @@ var Engine = (function(global) {
         body.appendChild(modal);
         global.modal = modal;
         render();
-        modal.addEventListener('click', menuButtons);
+        modal.addEventListener('click', menuButtons.Buttons);
         if (reusedVar.start === true) {
-            menu.menu("menu");
-        reusedVar.start = false;
-            console.log(1);
+            menu("menu");
+            reusedVar.start = false;
         }
     }
-    function playState() {
-                document.querySelector('.buttonCont').style.visibility = "visible";
-                console.log(12);
-                pause.k = false;
-                menu.menusVar = [];
-                menu.menus = [];
-                modal.remove();
-                player.reset();
-                star.reset(true);
-                star.reset(false);
-                heart.reset();
-                timer.timerStart();
-                allEnemies.forEach(function(enemy) {
-                    enemy.reset();
-                });
-                allEnemies = [];
-                for (let i = 0; i <= 2; i++) {
-                    allEnemies.push(new Enemy);
-                }
-                canvas.addEventListener('click', pause.paused)
-                lastTime = Date.now();
-                main();
-    }
-    function menuButtons(e) {
-        const target = e.target.className;
+    /*
+    * an event listener function for all of the menu buttons
+    */
+    const menuButtons = {
+        submit: false,
+        Buttons: function(e) {
+            const target = e.target.className;
             if (target === "Quick Game") {
                 playState();
             }
@@ -227,6 +193,7 @@ var Engine = (function(global) {
                 location.reload();
             }
             if (target === "Restart") {
+                menuButtons.submit = false;
                 playState();
             }
             if (target === "Player Select") {
@@ -238,8 +205,8 @@ var Engine = (function(global) {
                 playState();
             }
             if (target === "Submit") {
+                menuButtons.submit = true;
                 data.insert("random");
-                console.log(target);
                 e.target.style.background = "grey";
                 e.target.style.opacity = "0.3";
                 e.target.setAttribute('disabled', "");
@@ -250,140 +217,142 @@ var Engine = (function(global) {
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 leaderboards();
             }
+        }
     }
+    /* The gameplay state,
+    */
+    function playState() {
+        document.querySelector('.buttonCont').style.visibility = "visible";
+        pause.k = false;
+        modal.remove();
+        player.reset();
+        star.reset(true);
+        star.reset(false);
+        heart.reset();
+        timer.timerStart();
+        allEnemies.forEach(function(enemy) {
+            enemy.reset();
+        });
+        allEnemies = [];
+        for (let i = 0; i <= 2; i++) {
+            allEnemies.push(new Enemy);
+        }
+        canvas.addEventListener('click', pause.paused)
+        lastTime = Date.now();
+        main();
+    }
+    /* A function that runs in a loop. It draws all of the visual objects for the select screen,
+    * and calls the necessary object methods.
+    */
+    function selectUpdate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+        ctx.fillStyle = "#A9BCF5";
+        ctx.fillRect(0,50,canvas.width,canvas.height - 70);
 
-    function leaderboards() {
-        reset();
-        document.querySelector('.menu').remove();
-        data.update();
-        data.render();
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "#F5D0A9";
+        ctx.beginPath();
+        ctx.ellipse(250, 450, 40, 70, 90 * Math.PI/180, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(175, 380);
+        ctx.lineWidth = 2;
+        ctx.lineTo(180, 450);
+        ctx.lineTo(320, 450);
+        ctx.lineTo(325, 380);
+        ctx.lineTo(175, 380);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.moveTo(175, 380);
+        ctx.lineTo(180, 450);
+        ctx.stroke();
+        ctx.moveTo(320, 450);
+        ctx.lineTo(325, 380);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.ellipse(250, 380, 40, 75, 90 * Math.PI/180, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#FA5858";
+        ctx.strokeStyle = "white";
+        ctx.beginPath();
+        ctx.moveTo(50, 400);
+        ctx.lineTo(120, 350);
+        ctx.lineTo(120, 380);
+        ctx.lineTo(150, 380);
+        ctx.lineTo(150, 420);
+        ctx.lineTo(120, 420);
+        ctx.lineTo(120, 450);
+        ctx.lineTo(50, 400);
+        ctx.fill();
+        ctx.stroke();
+
+
+        ctx.beginPath();
+        ctx.moveTo(455, 400);
+        ctx.lineTo(385, 350);
+        ctx.lineTo(385, 380);
+        ctx.lineTo(355, 380);
+        ctx.lineTo(355, 420);
+        ctx.lineTo(385, 420);
+        ctx.lineTo(385, 450);
+        ctx.lineTo(455, 400);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillRect(200, 500, 100, 50);
+        ctx.fillStyle = "black";
+        ctx.font = "20px Arial"
+        ctx.fillText("Select", 223, 532)
+        ctx.strokeRect(200, 500, 100, 50);
+        ctx.strokeStyle = "black";
+
+
+        char1.render();
+        char1.update();
+        char2.render();
+        char2.update();
+        char3.render();
+        char3.update();
+        char4.render();
+        char4.update();
+        char5.render();
+        char5.update();
+
         ctx.fillStyle = "black";
         ctx.strokeRect(0, 10, 100, 35);
         ctx.font = '20px serif';
         ctx.fillText("Back", 28, 35);
-        canvas.addEventListener('click', selectButtons.back);
+
+        const anim = win.requestAnimationFrame(selectUpdate);
+        if (reusedVar.b === true || reusedVar.c === true) {
+            pauseSc(anim);
+        }
     }
-
-    function playerSelect() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        const body = document.querySelector('body');
-        const input = document.createElement('input');
-        input.classList.add('selectInput');
-        input.innerHTML = "";
-        input.placeholder = "Name";
-        body.appendChild(input);
-        canvas.addEventListener('click', selectButtons.buttons);
-        selectUpdate();
-}
-
-    function selectUpdate() {
-            ctx.clearRect(0,0,canvas.width,canvas.height)
-            ctx.fillStyle = "#A9BCF5";
-            ctx.fillRect(0,50,canvas.width,canvas.height - 70);
-
-            ctx.strokeStyle = "black";
-            ctx.fillStyle = "#F5D0A9";
-            ctx.beginPath();
-            ctx.ellipse(250, 450, 40, 70, 90 * Math.PI/180, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(175, 380);
-            ctx.lineWidth = 2;
-            ctx.lineTo(180, 450);
-            ctx.lineTo(320, 450);
-            ctx.lineTo(325, 380);
-            ctx.lineTo(175, 380);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.lineWidth = 2;
-            ctx.moveTo(175, 380);
-            ctx.lineTo(180, 450);
-            ctx.stroke();
-            ctx.moveTo(320, 450);
-            ctx.lineTo(325, 380);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.ellipse(250, 380, 40, 75, 90 * Math.PI/180, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();
-
-                ctx.fillStyle = "#FA5858";
-                ctx.strokeStyle = "white";
-                ctx.beginPath();
-                ctx.moveTo(50, 400);
-                ctx.lineTo(120, 350);
-                ctx.lineTo(120, 380);
-                ctx.lineTo(150, 380);
-                ctx.lineTo(150, 420);
-                ctx.lineTo(120, 420);
-                ctx.lineTo(120, 450);
-                ctx.lineTo(50, 400);
-                ctx.fill();
-                ctx.stroke();
-
-
-                ctx.beginPath();
-                ctx.moveTo(455, 400);
-                ctx.lineTo(385, 350);
-                ctx.lineTo(385, 380);
-                ctx.lineTo(355, 380);
-                ctx.lineTo(355, 420);
-                ctx.lineTo(385, 420);
-                ctx.lineTo(385, 450);
-                ctx.lineTo(455, 400);
-                ctx.fill();
-                ctx.stroke();
-
-                ctx.fillRect(200, 500, 100, 50);
-                ctx.fillStyle = "black";
-                ctx.font = "20px Arial"
-                ctx.fillText("Select", 223, 532)
-                ctx.strokeRect(200, 500, 100, 50);
-                ctx.strokeStyle = "black";
-
-
-            char1.render();
-            char1.update();
-            char2.render();
-            char2.update();
-            char3.render();
-            char3.update();
-            char4.render();
-            char4.update();
-            char5.render();
-            char5.update();
-
-            ctx.fillStyle = "black";
-            ctx.strokeRect(0, 10, 100, 35);
-            ctx.font = '20px serif';
-            ctx.fillText("Back", 28, 35);
-
-            const anim = win.requestAnimationFrame(selectUpdate);
-            if (reusedVar.b === true || reusedVar.c === true) {
-                pauseSc(anim);
-            }
-
-    }
-
+    /* This function checks whether certain conditions are met.
+    * It is responsible for openning a win and lost screen. A pause modal and for the back buttons.
+    */
     function pauseSc(el) {
         if (player.levels === 5) {
             win.cancelAnimationFrame(el);
             reset();
-            menu.menu("win");
+            menu("win");
         }
         if (hearts.hearts === 0) {
             win.cancelAnimationFrame(el);
             reset();
-            menu.menu("lost");
+            menu("lost");
         }
         if (pause.k === true) {
             win.cancelAnimationFrame(el);
             reset();
-            menu.menu("pause");
+            menu("pause");
         }
         if (reusedVar.b === true) {
             win.cancelAnimationFrame(el);
@@ -396,14 +365,11 @@ var Engine = (function(global) {
         if (reusedVar.c === true) {
             win.cancelAnimationFrame(el);
             ctx.clearRect(0,0,canvas.width,canvas.height)
-        reusedVar.start = true;
+            reusedVar.start = true;
             reusedVar.c = false;
             reset();
         }
     }
-
-
-
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
@@ -424,13 +390,16 @@ var Engine = (function(global) {
         'images/char-princess-girl.png'
     ]);
     Resources.onReady(init);
-
-    /* Assign the canvas' context object to the global variable (the window
+    /* Assign the canvas' context object, reset, playState, selectUpdate, main functions and
+    * menuButtons object to the global variable (the window
      * object when run in a browser) so that developers can use it more easily
      * from within their app.js files.
      */
     global.ctx = ctx;
     global.canvas = canvas;
     global.reset = reset;
-
+    global.playState = playState;
+    global.selectUpdate = selectUpdate;
+    global.main = main;
+    global.menuButtons = menuButtons;
 })(this);
