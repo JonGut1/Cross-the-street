@@ -339,7 +339,7 @@ var Engine = (function(global) {
     * It is responsible for openning a win and lost screen. A pause modal and for the back buttons.
     */
     function pauseSc(el) {
-        if (player.levels === 5) {
+        if (player.levels === 10) {
             win.cancelAnimationFrame(el);
             reset();
             menu("win");

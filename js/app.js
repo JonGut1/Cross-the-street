@@ -173,7 +173,7 @@ Player.prototype.update = function() {
         hearts.hearts -= 1;
         player.handleInput("boom");
     }
-    if (player.levels === 5) {
+    if (player.levels === 10) {
         player.score *= 2;
         player.score += hearts.hearts * 20;
         player.score -= timer.count;

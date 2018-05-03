@@ -24,7 +24,7 @@ After a win the player is given a choice to enter a name and submit the score to
 
 ## Mechanics
 
-The player can control the character by arrow keys on the keyboard or on the screen if the user chooses to play on a mobile device. Also after a certain amount of crosses through the road, the enemy objects will increase in speed. If the player is hit by the enemy, the player will be placed at the beginning. If the player runs out of hearts, then the player will loose the game. If a player crosses the road a certain amount of times, then the player wins the game.
+The player can control the character by arrow keys on the keyboard or on the screen if the user chooses to play on a mobile device. Also after a certain amount of crosses through the road, the enemy objects will increase in speed. If the player is hit by the enemy, the player will be placed at the beginning. If the player runs out of hearts, then the player will lose the game. If a player crosses the road a certain amount of times, then the player wins the game.
 
 ## Code
 
@@ -42,17 +42,14 @@ Styles,
 
 app.css - styles the whole page. Adjusts the font sizes, colors and position of the elements. Also makes the page responsive.
 
-Google Fonts - styles the fonts of the text elements of the page.
-Used fonts: (https://fonts.googleapis.com/css?family=Chicle", https://fonts.googleapis.com/css?family=Source+Sans+Pro).
-
 Bootstrap - from https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css, adds icons such as arrows for the screen movement buttons
 
 Game logic,
 
-app.js - this is all of the code that is responsible for calculating and creating various objects, movement and interactions.
+app.js - this is all of the code that is responsible for calculating and creating various objects, movements and interactions.
 
 engine.js - this is a game engine, which runs in a loop. All of the necessary invocations are placed here, so that they would be repeated continuesly and the animations would be possible and the collision and other required information would be updated.
 
 recource.js - this is where all of the images are loaded and stored, so that some stress would be relieved from all of the image loading.
 
-Local browser storage - stores the information of the players current match such as the players chosen name also the matches score, time, hearts stars.
+Local browser storage - stores the information of the players current match such as the players chosen name also the matches score, time, hearts and stars.
