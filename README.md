@@ -22,6 +22,8 @@ After a loss the player is given a choice to restart the game, to check the lead
 
 After a win the player is given a choice to enter a name and submit the score to the leaderboard. Also the player could just restart or quit the game.
 
+Note: if any errors occur regarding the leaderboards please clear your local storage, so that any duplicate that might have caused some problems would be removed.
+
 ## Mechanics
 
 The player can control the character by arrow keys on the keyboard or on the screen if the user chooses to play on a mobile device. Also after a certain amount of crosses through the road, the enemy objects will increase in speed. If the player is hit by the enemy, the player will be placed at the beginning. If the player runs out of hearts, then the player will lose the game. If a player crosses the road a certain amount of times, then the player wins the game.
