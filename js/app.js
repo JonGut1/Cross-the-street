@@ -153,7 +153,9 @@ function Player() {
 * renders the players depending whether the player was selected or not.
 */
 Player.prototype.render = function() {
-    this.localSprite = localStorage.Recent_Character;
+    if (localStorage.FroggerCloneByJonas != undefined) {
+        this.localSprite = JSON.parse(localStorage.FroggerCloneByJonas).Recent_Character;
+    }
     if (this.localSprite != undefined && this.continue === true) {
         ctx.drawImage(Resources.get(this.sprite[parseInt(this.localSprite)]), this.gridX[this.moveX], this.gridY[this.moveY]);
     } else {
@@ -578,8 +580,8 @@ const inputField = {
         }
         const input = document.createElement('input');
         input.classList.add('nameInput');
-        if (localStorage[data.storage2] != undefined && player.continue === true){
-            input.setAttribute('value', localStorage[data.storage2]);
+        if (localStorage.FroggerCloneByJonas != undefined && player.continue === true){
+            input.setAttribute('value', JSON.parse(localStorage.FroggerCloneByJonas).Recent_Name);
         } else {
             input.placeholder = "Name";
         }
@@ -938,10 +940,20 @@ function Data() {
     this.tag;
     this.tagArr = [char1, char2, char3, char4, char5];
     this.stringTag = ["char1", "char2", "char3", "char4", "char5"];
-    if (localStorage.TimesPlayed === undefined) {
+    this.parLocal = {
+        Character: [],
+        Name: [],
+        Score: [],
+        Time: [],
+        Stars: [],
+        Hearts: [],
+        TimesPlayed: 0,
+    };
+    if (localStorage.FroggerCloneByJonas === undefined) {
         this.timesPlayed = 0;
     } else {
-        this.timesPlayed = localStorage.TimesPlayed;
+        this.parLocal = JSON.parse(localStorage.FroggerCloneByJonas);
+        this.timesPlayed = this.parLocal.TimesPlayed;
     }
     this.individualScore = [];
     this.leaderboard = [];
@@ -977,54 +989,39 @@ Data.prototype.insert = function(el) {
     this.input = document.querySelector('input');
     if (el === "select") {
         this.value = document.querySelector('.selectInput').value;
-        localStorage.setItem(this.storage1, this.tag);
-        localStorage.setItem(this.storage2, this.value);
+        this.parLocal.Recent_Character = this.tag;
+        this.parLocal.Recent_Name = this.value;
+        localStorage.setItem("FroggerCloneByJonas", JSON.stringify(this.parLocal));
         return;
     }
     if (this.timesPlayed === undefined || this.timesPlayed === NaN || this.timesPlayed === null) {
         this.timesPlayed = 1;
     } else {
-        this.int = parseInt(this.timesPlayed);
-        this.int += 1;
-        this.timesPlayed = this.int;
+        this.timesPlayed += 1;
     }
     /**
     * if the player has not clicked a select button in player select screen then
     * all of the score is inserted into the localStorage.
     */
     if (el === "random") {
-
-        this.name += this.timesPlayed;
-        this.character += this.timesPlayed;
-        this.score += this.timesPlayed;
-        this.time += this.timesPlayed;
-        this.star += this.timesPlayed;
-        this.heart += this.timesPlayed;
         /**
         * if the player select tag is present in the localStorage, then
         * that tag will be used to add together with other scores.
         */
-        if (player.localSprite != undefined || player.localSprite != null || player.localSprite != NaN && player.continue === true) {
+        if (player.continue === true && player.localSprite != undefined) {
             this.tag = parseInt(player.localSprite);
         } else {
             this.tag = player.random;
         }
-        localStorage.setItem("TimesPlayed", this.timesPlayed);
-        localStorage.setItem(this.timesPlayed, this.stringTag);
+        this.parLocal.Character.push(this.tag);
+        this.parLocal.Name.push(this.input.value);
+        this.parLocal.Score.push(player.score);
+        this.parLocal.Time.push(timer.count);
+        this.parLocal.Stars.push(star.starsCollected);
+        this.parLocal.Hearts.push(hearts.hearts);
+        this.parLocal.TimesPlayed = this.timesPlayed;
 
-        localStorage.setItem(this.character, this.tag);
-        localStorage.setItem(this.name, this.input.value);
-        localStorage.setItem(this.score, player.score);
-        localStorage.setItem(this.time, timer.count);
-        localStorage.setItem(this.star, star.starsCollected);
-        localStorage.setItem(this.heart, hearts.hearts);
-
-        this.name = "Name";
-        this.character = "Character";
-        this.score = "Score";
-        this.time = "Time";
-        this.star = "Stars";
-        this.heart = "Hearts";
+        localStorage.setItem("FroggerCloneByJonas", JSON.stringify(this.parLocal));
     }
 };
 /**
@@ -1046,23 +1043,11 @@ Data.prototype.update = function() {
     * Increments the Keys of the localStorage, so that the data would not be overwritten.
     */
     if (this.timesPlayed > 0) {
-        for (let i = 1; i <= this.timesPlayed; i++) {
-            this.n = this.name + i;
-            this.names = localStorage[this.n];
-            this.c = this.character + i;
-            this.characters = localStorage[this.c];
-            this.s = this.score + i;
-            this.scores = localStorage[this.s];
-            this.t = this.time + i;
-            this.times = localStorage[this.t];
-            this.st = this.star + i;
-            this.stars = localStorage[this.st];
-            this.h = this.heart + i;
-            this.hearts = localStorage[this.h];
+        for (let i = 0; i < this.timesPlayed; i++) {
             /**
             * pushes all of the players data into an array from localStorage.
             */
-            this.leaderboard.push([this.characters, this.names, this.scores, this.times, this.stars, this.hearts]);
+            this.leaderboard.push([this.parLocal.Character[i], this.parLocal.Name[i], this.parLocal.Score[i], this.parLocal.Time[i], this.parLocal.Stars[i], this.parLocal.Hearts[i]]);
         }
         /**
         * pushes into a this.scoreArr only the scores data.
